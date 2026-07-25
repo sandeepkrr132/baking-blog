@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe | Sweet Crumbs</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🧁</span>
+                    <span class="logo-text">Sweet Crumbs</span>
+                </a>
+                <nav class="nav">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="index.html#recipes" class="nav-link">Recipes</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Recipe Hero -->
+    <section class="recipe-hero" id="recipeHero">
+        <div class="container">
+            <!-- Recipe content loaded by JavaScript -->
+        </div>
+    </section>
+
+    <!-- Recipe Content -->
+    <main class="recipe-content">
+        <div class="container">
+            <div class="recipe-layout">
+                <!-- Ingredients Column -->
+                <aside class="ingredients-sidebar" id="ingredientsSidebar">
+                    <h2>Ingredients</h2>
+                    <ul class="ingredients-list" id="ingredientsList">
+                        <!-- Ingredients loaded here -->
+                    </ul>
+                </aside>
+
+                <!-- Instructions Column -->
+                <section class="instructions" id="instructionsSection">
+                    <h2>Instructions</h2>
+                    <div class="steps" id="stepsContainer">
+                        <!-- Steps loaded here -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Back Button -->
+    <div class="container">
+        <a href="index.html" class="btn btn-secondary back-btn">&larr; Back to All Recipes</a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Sweet Crumbs Baking Blog. Happy Baking! 🍪</p>
+        </div>
+    </footer>
+
+    <!-- Timer Alert Sound (using Web Audio API instead) -->
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sweet Crumbs | Baking Blog</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🧁</span>
+                    <span class="logo-text">Sweet Crumbs</span>
+                </a>
+                <nav class="nav">
+                    <a href="index.html" class="nav-link active">Home</a>
+                    <a href="#recipes" class="nav-link">Recipes</a>
+                    <a href="#about" class="nav-link">About</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Baking Made Simple</h1>
+            <p>Delicious recipes with built-in timers so you never overbake again.</p>
+            <a href="#recipes" class="btn btn-primary">Browse Recipes</a>
+        </div>
+    </section>
+
+    <!-- Category Filter -->
+    <section class="categories" id="recipes">
+        <div class="container">
+            <h2 class="section-title">Our Recipes</h2>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-category="all">All</button>
+                <button class="filter-btn" data-category="cookies">Cookies</button>
+                <button class="filter-btn" data-category="cakes">Cakes</button>
+                <button class="filter-btn" data-category="bread">Bread</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recipe Grid -->
+    <section class="recipe-grid">
+        <div class="container">
+            <div class="grid" id="recipeGrid">
+                <!-- Recipes will be loaded here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="container">
+            <div class="about-content">
+                <h2>About Sweet Crumbs</h2>
+                <p>Welcome to Sweet Crumbs! I'm passionate about making baking accessible to everyone. Every recipe comes with built-in timers, so you can focus on the joy of baking without constantly watching the clock.</p>
+                <p>Whether you're a beginner baker or a seasoned pro, you'll find tested, reliable recipes with clear instructions and helpful tips.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Sweet Crumbs Baking Blog. Happy Baking! 🍪</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
