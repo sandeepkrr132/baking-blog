@@ -3,143 +3,14 @@
    ======================================== */
 
 // ========================================
-// Recipe Data (embedded for local file access)
+// Supabase Config (shared with auth.js)
 // ========================================
-const recipes = [
-    {
-        "id": "chocolate-chip-cookies",
-        "title": "Classic Chocolate Chip Cookies",
-        "image": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=800&h=600&fit=crop",
-        "category": "cookies",
-        "prepTime": 15,
-        "cookTime": 12,
-        "servings": 24,
-        "difficulty": "Easy",
-        "description": "Crispy on the edges, chewy in the center - the perfect chocolate chip cookie.",
-        "ingredients": [
-            {"amount": "2 1/4 cups", "name": "all-purpose flour"},
-            {"amount": "1 tsp", "name": "baking soda"},
-            {"amount": "1 tsp", "name": "salt"},
-            {"amount": "1 cup (2 sticks)", "name": "butter, softened"},
-            {"amount": "3/4 cup", "name": "granulated sugar"},
-            {"amount": "3/4 cup", "name": "packed brown sugar"},
-            {"amount": "2", "name": "large eggs"},
-            {"amount": "2 tsp", "name": "vanilla extract"},
-            {"amount": "2 cups", "name": "chocolate chips"}
-        ],
-        "steps": [
-            {"text": "Preheat oven to 375°F (190°C). Line baking sheets with parchment paper.", "timerMinutes": null},
-            {"text": "In a medium bowl, whisk together flour, baking soda, and salt. Set aside.", "timerMinutes": null},
-            {"text": "In a large bowl, beat the softened butter with both sugars until light and fluffy.", "timerMinutes": 3, "timerLabel": "Cream butter & sugar"},
-            {"text": "Beat in eggs one at a time, then add vanilla extract.", "timerMinutes": null},
-            {"text": "Gradually mix in the flour mixture until just combined.", "timerMinutes": null},
-            {"text": "Fold in chocolate chips with a spatula.", "timerMinutes": null},
-            {"text": "Drop rounded tablespoons of dough onto prepared baking sheets, spacing 2 inches apart.", "timerMinutes": null},
-            {"text": "Bake until golden brown on edges but still soft in the center.", "timerMinutes": 12, "timerLabel": "Bake time"},
-            {"text": "Let cool on baking sheet for 5 minutes, then transfer to wire rack.", "timerMinutes": 5, "timerLabel": "Cooling time"}
-        ]
-    },
-    {
-        "id": "vanilla-cupcakes",
-        "title": "Fluffy Vanilla Cupcakes",
-        "image": "https://images.unsplash.com/photo-1576618148400-f54bed99fcfd?w=800&h=600&fit=crop",
-        "category": "cakes",
-        "prepTime": 20,
-        "cookTime": 20,
-        "servings": 12,
-        "difficulty": "Easy",
-        "description": "Light, fluffy vanilla cupcakes topped with creamy buttercream frosting.",
-        "ingredients": [
-            {"amount": "1 1/2 cups", "name": "all-purpose flour"},
-            {"amount": "1 1/2 tsp", "name": "baking powder"},
-            {"amount": "1/4 tsp", "name": "salt"},
-            {"amount": "1/2 cup", "name": "butter, softened"},
-            {"amount": "3/4 cup", "name": "granulated sugar"},
-            {"amount": "2", "name": "large eggs"},
-            {"amount": "2 tsp", "name": "vanilla extract"},
-            {"amount": "1/2 cup", "name": "whole milk"},
-            {"amount": "1 cup", "name": "butter for frosting"},
-            {"amount": "3 cups", "name": "powdered sugar"},
-            {"amount": "1-2 tbsp", "name": "heavy cream"}
-        ],
-        "steps": [
-            {"text": "Preheat oven to 350°F (175°C). Line a 12-cup muffin tin with cupcake liners.", "timerMinutes": null},
-            {"text": "Whisk together flour, baking powder, and salt in a medium bowl.", "timerMinutes": null},
-            {"text": "In a large bowl, cream butter and sugar until light and fluffy.", "timerMinutes": 4, "timerLabel": "Cream butter & sugar"},
-            {"text": "Add eggs one at a time, beating well after each. Mix in vanilla.", "timerMinutes": null},
-            {"text": "Alternate adding flour mixture and milk to the butter mixture, starting and ending with flour. Mix until just combined.", "timerMinutes": null},
-            {"text": "Divide batter evenly among cupcake liners (about 2/3 full).", "timerMinutes": null},
-            {"text": "Bake until a toothpick inserted in center comes out clean.", "timerMinutes": 20, "timerLabel": "Bake time"},
-            {"text": "Cool in pan for 5 minutes, then transfer to wire rack to cool completely.", "timerMinutes": 15, "timerLabel": "Cool completely"},
-            {"text": "For frosting: Beat butter until creamy, gradually add powdered sugar, then cream until fluffy.", "timerMinutes": 5, "timerLabel": "Make frosting"},
-            {"text": "Frost cooled cupcakes and decorate as desired.", "timerMinutes": null}
-        ]
-    },
-    {
-        "id": "sourdough-bread",
-        "title": "Rustic Sourdough Bread",
-        "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&h=600&fit=crop",
-        "category": "bread",
-        "prepTime": 30,
-        "cookTime": 45,
-        "servings": 8,
-        "difficulty": "Intermediate",
-        "description": "Crusty artisan sourdough with a chewy, tangy interior.",
-        "ingredients": [
-            {"amount": "500g", "name": "bread flour"},
-            {"amount": "350g", "name": "warm water"},
-            {"amount": "100g", "name": "active sourdough starter"},
-            {"amount": "10g", "name": "salt"},
-            {"amount": "1 tbsp", "name": "olive oil (for bowl)"}
-        ],
-        "steps": [
-            {"text": "In a large bowl, mix flour and water until no dry bits remain. Let rest (autolyse).", "timerMinutes": 30, "timerLabel": "Autolyse"},
-            {"text": "Add sourdough starter and salt. Mix and fold until fully incorporated.", "timerMinutes": 10, "timerLabel": "Mix & fold"},
-            {"text": "Perform stretch and folds every 30 minutes for the first 2 hours.", "timerMinutes": 120, "timerLabel": "Stretch & folds"},
-            {"text": "Cover and let the dough rise at room temperature until doubled.", "timerMinutes": 240, "timerLabel": "Bulk fermentation"},
-            {"text": "Turn dough onto lightly floured surface. Shape into a round boule.", "timerMinutes": null},
-            {"text": "Place seam-side up in a floured banneton or bowl. Cover and refrigerate overnight.", "timerMinutes": 480, "timerLabel": "Cold proof (or overnight)"},
-            {"text": "Preheat oven to 500°F (260°C) with Dutch oven inside for at least 45 minutes.", "timerMinutes": 45, "timerLabel": "Preheat Dutch oven"},
-            {"text": "Carefully place dough in hot Dutch oven. Score the top with a razor blade.", "timerMinutes": null},
-            {"text": "Bake covered for 30 minutes, then remove lid and bake until deep golden brown.", "timerMinutes": 15, "timerLabel": "Uncovered bake"},
-            {"text": "Transfer to wire rack and let cool completely before slicing.", "timerMinutes": 60, "timerLabel": "Cool completely"}
-        ]
-    },
-    {
-        "id": "banana-bread",
-        "title": "Moist Banana Bread",
-        "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&h=600&fit=crop",
-        "category": "cakes",
-        "prepTime": 15,
-        "cookTime": 60,
-        "servings": 10,
-        "difficulty": "Easy",
-        "description": "Super moist banana bread with a crispy top. The more brown spots on your bananas, the better!",
-        "ingredients": [
-            {"amount": "3", "name": "ripe bananas, mashed"},
-            {"amount": "1/3 cup", "name": "melted butter"},
-            {"amount": "3/4 cup", "name": "sugar"},
-            {"amount": "1", "name": "large egg, beaten"},
-            {"amount": "1 tsp", "name": "vanilla extract"},
-            {"amount": "1 tsp", "name": "baking soda"},
-            {"amount": "pinch", "name": "salt"},
-            {"amount": "1 1/2 cups", "name": "all-purpose flour"},
-            {"amount": "1/2 cup", "name": "chocolate chips (optional)"}
-        ],
-        "steps": [
-            {"text": "Preheat oven to 350°F (175°C). Grease a 9x5 inch loaf pan.", "timerMinutes": null},
-            {"text": "In a large bowl, mash the bananas with a fork until smooth.", "timerMinutes": null},
-            {"text": "Stir in melted butter, sugar, beaten egg, and vanilla extract.", "timerMinutes": null},
-            {"text": "Sprinkle baking soda and salt over the mixture, stir to combine.", "timerMinutes": null},
-            {"text": "Add flour and stir until just combined. Do not overmix!", "timerMinutes": null},
-            {"text": "Fold in chocolate chips if using.", "timerMinutes": null},
-            {"text": "Pour batter into prepared loaf pan.", "timerMinutes": null},
-            {"text": "Bake until a toothpick inserted in the center comes out clean.", "timerMinutes": 60, "timerLabel": "Bake time"},
-            {"text": "Let cool in pan for 10 minutes, then turn out onto wire rack.", "timerMinutes": 10, "timerLabel": "Cool in pan"},
-            {"text": "Slice and serve warm or at room temperature. Enjoy!", "timerMinutes": null}
-        ]
-    }
-];
+// SUPABASE_URL and SUPABASE_ANON_KEY are defined in auth.js
+
+// ========================================
+// Recipe Data (loaded from Supabase)
+// ========================================
+let recipes = [];
 
 // Timer state management
 const timers = {};
@@ -236,6 +107,83 @@ function formatTime(seconds) {
 }
 
 // ========================================
+// Convert minutes to ISO 8601 duration
+// ========================================
+function toISO8601Duration(minutes) {
+    if (!minutes || minutes <= 0) return null;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours > 0 && mins > 0) return `PT${hours}H${mins}M`;
+    if (hours > 0) return `PT${hours}H`;
+    return `PT${mins}M`;
+}
+
+// ========================================
+// Populate JSON-LD Structured Data
+// ========================================
+function populateJsonLd(recipe) {
+    const schema = {
+        "@context": "https://schema.org",
+        "@type": "Recipe",
+        "name": recipe.title,
+        "image": [recipe.image],
+        "description": recipe.description,
+        "recipeCategory": recipe.category,
+        "recipeYield": `${recipe.servings} servings`,
+        "recipeIngredient": recipe.ingredients.map(ing => `${ing.amount} ${ing.name}`.trim()),
+        "recipeInstructions": recipe.steps.map(step => ({
+            "@type": "HowToStep",
+            "text": step.text
+        }))
+    };
+
+    // Add times (ISO 8601 duration)
+    const prepTime = toISO8601Duration(recipe.prepTime);
+    const cookTime = toISO8601Duration(recipe.cookTime);
+    const totalTime = toISO8601Duration((recipe.prepTime || 0) + (recipe.cookTime || 0));
+
+    if (prepTime) schema.prepTime = prepTime;
+    if (cookTime) schema.cookTime = cookTime;
+    if (totalTime) schema.totalTime = totalTime;
+
+    // Add keywords from category + title words
+    const titleWords = recipe.title.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+    schema.keywords = [recipe.category, ...titleWords].join(', ');
+
+    // Pin image if available
+    if (recipe.pinImage) {
+        schema.image.push(recipe.pinImage);
+    }
+
+    // Inject into page
+    const scriptEl = document.getElementById('recipeSchema');
+    if (scriptEl) {
+        scriptEl.textContent = JSON.stringify(schema, null, 2);
+    }
+}
+
+// ========================================
+// Populate Open Graph & Twitter Meta Tags
+// ========================================
+function populateOgTags(recipe) {
+    const ogImage = recipe.pinImage || recipe.image;
+    const pageUrl = window.location.href;
+
+    const setMeta = (selector, content) => {
+        const el = document.querySelector(selector);
+        if (el) el.setAttribute('content', content);
+    };
+
+    setMeta('meta[property="og:title"]', `${recipe.title} | Sweet Crumbs`);
+    setMeta('meta[property="og:description"]', recipe.description);
+    setMeta('meta[property="og:image"]', ogImage);
+    setMeta('meta[property="og:url"]', pageUrl);
+    setMeta('meta[name="twitter:title"]', `${recipe.title} | Sweet Crumbs`);
+    setMeta('meta[name="twitter:description"]', recipe.description);
+    setMeta('meta[name="twitter:image"]', ogImage);
+}
+
+// ========================================
 // Timer Functions
 // ========================================
 function startTimer(timerId) {
@@ -310,6 +258,32 @@ function updateTimerDisplay(timerId) {
 }
 
 // ========================================
+// Fetch Recipes from Supabase
+// ========================================
+async function fetchRecipes() {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes?select=*`, {
+        headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        }
+    });
+    if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
+    return await response.json();
+}
+
+async function fetchRecipeById(id) {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes?id=eq.${encodeURIComponent(id)}&select=*`, {
+        headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        }
+    });
+    if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
+    const data = await response.json();
+    return data[0] || null;
+}
+
+// ========================================
 // Render Recipe Cards (Homepage)
 // ========================================
 function renderRecipeCards(recipesList, container) {
@@ -355,18 +329,25 @@ function setupCategoryFilter(container) {
 // ========================================
 // Load Homepage
 // ========================================
-function loadHomepage() {
+async function loadHomepage() {
     const grid = document.getElementById('recipeGrid');
     if (!grid) return;
 
-    renderRecipeCards(recipes, grid);
-    setupCategoryFilter(grid);
+    try {
+        grid.innerHTML = '<p class="loading">Loading recipes...</p>';
+        recipes = await fetchRecipes();
+        renderRecipeCards(recipes, grid);
+        setupCategoryFilter(grid);
+    } catch (err) {
+        console.error('Failed to load recipes:', err);
+        grid.innerHTML = '<p class="loading">Failed to load recipes. Please try again later.</p>';
+    }
 }
 
 // ========================================
 // Load Single Recipe
 // ========================================
-function loadRecipePage() {
+async function loadRecipePage() {
     const heroSection = document.getElementById('recipeHero');
     const ingredientsList = document.getElementById('ingredientsList');
     const stepsContainer = document.getElementById('stepsContainer');
@@ -382,96 +363,106 @@ function loadRecipePage() {
         return;
     }
 
-    const recipe = recipes.find(r => r.id === recipeId);
+    try {
+        heroSection.innerHTML = '<p class="loading">Loading recipe...</p>';
+        const recipe = await fetchRecipeById(recipeId);
 
-    if (!recipe) {
-        heroSection.innerHTML = '<p class="loading">Recipe not found. <a href="index.html">Browse recipes</a></p>';
-        return;
-    }
-
-    // Update page title
-    document.title = `${recipe.title} | Sweet Crumbs`;
-
-    // Render hero
-    heroSection.innerHTML = `
-        <div class="recipe-hero-content">
-            <img src="${recipe.image}" alt="${recipe.title}" class="recipe-hero-image">
-            <div class="recipe-hero-info">
-                <h1>${recipe.title}</h1>
-                <p class="recipe-hero-description">${recipe.description}</p>
-                <div class="recipe-meta">
-                    <div class="recipe-meta-item">
-                        <div class="recipe-meta-label">Prep Time</div>
-                        <div class="recipe-meta-value">${recipe.prepTime} min</div>
-                    </div>
-                    <div class="recipe-meta-item">
-                        <div class="recipe-meta-label">Cook Time</div>
-                        <div class="recipe-meta-value">${recipe.cookTime} min</div>
-                    </div>
-                    <div class="recipe-meta-item">
-                        <div class="recipe-meta-label">Servings</div>
-                        <div class="recipe-meta-value">${recipe.servings}</div>
-                    </div>
-                    <div class="recipe-meta-item">
-                        <div class="recipe-meta-label">Difficulty</div>
-                        <div class="recipe-meta-value">${recipe.difficulty}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // Render ingredients
-    ingredientsList.innerHTML = recipe.ingredients.map((ing, index) => `
-        <li class="ingredient-item" data-index="${index}" onclick="toggleIngredient(this)">
-            <div class="ingredient-checkbox"></div>
-            <span class="ingredient-amount">${ing.amount}</span>
-            <span class="ingredient-name">${ing.name}</span>
-        </li>
-    `).join('');
-
-    // Render steps with timers
-    stepsContainer.innerHTML = recipe.steps.map((step, index) => {
-        const stepId = `step-${index}`;
-        let timerHtml = '';
-
-        if (step.timerMinutes) {
-            const totalSeconds = step.timerMinutes * 60;
-            timers[stepId] = {
-                totalSeconds: totalSeconds,
-                remaining: totalSeconds,
-                running: false,
-                finished: false,
-                label: step.timerLabel || `Step ${index + 1}`,
-                interval: null
-            };
-
-            timerHtml = `
-                <div class="timer-container">
-                    <span class="timer-label">⏱️ ${step.timerLabel || 'Timer'}:</span>
-                    <span class="timer-display" id="timer-display-${stepId}">${formatTime(totalSeconds)}</span>
-                    <div class="timer-buttons">
-                        <button class="timer-btn timer-btn-start" id="timer-start-${stepId}" onclick="startTimer('${stepId}')">Start</button>
-                        <button class="timer-btn timer-btn-pause" id="timer-pause-${stepId}" onclick="pauseTimer('${stepId}')" disabled>Pause</button>
-                        <button class="timer-btn timer-btn-reset" onclick="resetTimer('${stepId}')">Reset</button>
-                    </div>
-                </div>
-            `;
+        if (!recipe) {
+            heroSection.innerHTML = '<p class="loading">Recipe not found. <a href="index.html">Browse recipes</a></p>';
+            return;
         }
 
-        return `
-            <div class="step" id="${stepId}">
-                <div class="step-header">
-                    <span class="step-number">${index + 1}</span>
-                    <p class="step-text">${step.text}</p>
+        // Update page title
+        document.title = `${recipe.title} | Sweet Crumbs`;
+
+        // Populate structured data and meta tags
+        populateJsonLd(recipe);
+        populateOgTags(recipe);
+
+        // Render hero
+        heroSection.innerHTML = `
+            <div class="recipe-hero-content">
+                <img src="${recipe.image}" alt="${recipe.title}" class="recipe-hero-image">
+                <div class="recipe-hero-info">
+                    <h1>${recipe.title}</h1>
+                    <p class="recipe-hero-description">${recipe.description}</p>
+                    <div class="recipe-meta">
+                        <div class="recipe-meta-item">
+                            <div class="recipe-meta-label">Prep Time</div>
+                            <div class="recipe-meta-value">${recipe.prepTime} min</div>
+                        </div>
+                        <div class="recipe-meta-item">
+                            <div class="recipe-meta-label">Cook Time</div>
+                            <div class="recipe-meta-value">${recipe.cookTime} min</div>
+                        </div>
+                        <div class="recipe-meta-item">
+                            <div class="recipe-meta-label">Servings</div>
+                            <div class="recipe-meta-value">${recipe.servings}</div>
+                        </div>
+                        <div class="recipe-meta-item">
+                            <div class="recipe-meta-label">Difficulty</div>
+                            <div class="recipe-meta-value">${recipe.difficulty}</div>
+                        </div>
+                    </div>
                 </div>
-                ${timerHtml}
-                <button class="step-complete-btn" onclick="toggleStepComplete('${stepId}')">
-                    Mark Complete
-                </button>
             </div>
         `;
-    }).join('');
+
+        // Render ingredients
+        ingredientsList.innerHTML = recipe.ingredients.map((ing, index) => `
+            <li class="ingredient-item" data-index="${index}" onclick="toggleIngredient(this)">
+                <div class="ingredient-checkbox"></div>
+                <span class="ingredient-amount">${ing.amount}</span>
+                <span class="ingredient-name">${ing.name}</span>
+            </li>
+        `).join('');
+
+        // Render steps with timers
+        stepsContainer.innerHTML = recipe.steps.map((step, index) => {
+            const stepId = `step-${index}`;
+            let timerHtml = '';
+
+            if (step.timerMinutes) {
+                const totalSeconds = step.timerMinutes * 60;
+                timers[stepId] = {
+                    totalSeconds: totalSeconds,
+                    remaining: totalSeconds,
+                    running: false,
+                    finished: false,
+                    label: step.timerLabel || `Step ${index + 1}`,
+                    interval: null
+                };
+
+                timerHtml = `
+                    <div class="timer-container">
+                        <span class="timer-label">⏱️ ${step.timerLabel || 'Timer'}:</span>
+                        <span class="timer-display" id="timer-display-${stepId}">${formatTime(totalSeconds)}</span>
+                        <div class="timer-buttons">
+                            <button class="timer-btn timer-btn-start" id="timer-start-${stepId}" onclick="startTimer('${stepId}')">Start</button>
+                            <button class="timer-btn timer-btn-pause" id="timer-pause-${stepId}" onclick="pauseTimer('${stepId}')" disabled>Pause</button>
+                            <button class="timer-btn timer-btn-reset" onclick="resetTimer('${stepId}')">Reset</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="step" id="${stepId}">
+                    <div class="step-header">
+                        <span class="step-number">${index + 1}</span>
+                        <p class="step-text">${step.text}</p>
+                    </div>
+                    ${timerHtml}
+                    <button class="step-complete-btn" onclick="toggleStepComplete('${stepId}')">
+                        Mark Complete
+                    </button>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error('Failed to load recipe:', err);
+        heroSection.innerHTML = '<p class="loading">Failed to load recipe. Please try again later.</p>';
+    }
 }
 
 // ========================================
@@ -499,7 +490,10 @@ function toggleStepComplete(stepId) {
 // ========================================
 // Initialize on DOM Load
 // ========================================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Render auth nav
+    renderAuthNav();
+
     // Check if we're on the homepage or recipe page
     if (document.getElementById('recipeGrid')) {
         loadHomepage();
@@ -507,6 +501,37 @@ document.addEventListener('DOMContentLoaded', () => {
         loadRecipePage();
     }
 });
+
+// ========================================
+// Auth Nav Rendering
+// ========================================
+async function renderAuthNav() {
+    const navEl = document.getElementById('authNav');
+    if (!navEl) return;
+
+    try {
+        const user = await checkSession();
+        if (user && user.email) {
+            const meta = user.user_metadata || user.raw_user_meta_data || {};
+            const name = meta.full_name || meta.name || user.email.split('@')[0];
+            const avatar = meta.avatar_url || meta.picture || null;
+            navEl.innerHTML = `
+                <div class="user-menu" style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;position:relative;">
+                    ${avatar
+                        ? `<img src="${avatar}" alt="${name}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">`
+                        : `<span style="width:32px;height:32px;border-radius:50%;background:var(--color-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.875rem;">${name.charAt(0).toUpperCase()}</span>`
+                    }
+                    <span style="font-weight:500;color:var(--color-text);font-size:0.9rem;">${name}</span>
+                    <button onclick="signOut()" style="margin-left:0.5rem;padding:0.375rem 0.75rem;border:1px solid var(--color-border);background:white;border-radius:var(--radius-sm);cursor:pointer;font-size:0.8rem;color:var(--color-text-light);">Sign out</button>
+                </div>
+            `;
+        } else {
+            navEl.innerHTML = `<a href="login.html" class="nav-link" style="padding:0.5rem 1rem;border:2px solid var(--color-primary);border-radius:var(--radius-sm);color:var(--color-primary);font-weight:600;">Sign In</a>`;
+        }
+    } catch (e) {
+        navEl.innerHTML = `<a href="login.html" class="nav-link" style="padding:0.5rem 1rem;border:2px solid var(--color-primary);border-radius:var(--radius-sm);color:var(--color-primary);font-weight:600;">Sign In</a>`;
+    }
+}
 
 // Clean up intervals on page unload
 window.addEventListener('beforeunload', () => {

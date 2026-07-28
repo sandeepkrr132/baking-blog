@@ -789,3 +789,105 @@ h2 {
 .timer-toast-close:hover {
     opacity: 1;
 }
+
+/* ========================================
+   Login Page
+   ======================================== */
+.login-page {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+}
+.login-card {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: 3rem;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+}
+.login-card h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.login-card p { color: var(--color-text-light); margin-bottom: 2rem; }
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.875rem 2rem;
+    border: 2px solid var(--color-border);
+    background: var(--color-white);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.google-btn:hover {
+    background: var(--color-bg-alt);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+.google-btn svg { width: 20px; height: 20px; }
+.login-error {
+    background: #FEE2E2;
+    color: #DC2626;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    display: none;
+}
+.login-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    color: var(--color-text-light);
+    font-size: 0.875rem;
+}
+.login-divider::before,
+.login-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--color-border);
+}
+.guest-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+.guest-link:hover { text-decoration: underline; }
+
+/* Callback page */
+.callback-page {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.callback-card { text-align: center; padding: 3rem; }
+.callback-card h1 { font-size: 1.75rem; margin-bottom: 1rem; }
+.callback-card p { color: var(--color-text-light); }
+.callback-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1.5rem;
+}
+.callback-error {
+    background: #FEE2E2;
+    color: #DC2626;
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    margin-top: 1rem;
+}
