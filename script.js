@@ -414,8 +414,7 @@ async function uploadRecipeImage(file) {
         headers: {
             'apikey': SUPABASE_ANON_KEY,
             'Authorization': `Bearer ${getAccessToken()}`,
-            'Content-Type': file.type || 'application/octet-stream',
-            'x-upsert': 'true'
+            'Content-Type': file.type || 'application/octet-stream'
         },
         body: file
     });
