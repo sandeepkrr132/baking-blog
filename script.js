@@ -340,7 +340,13 @@ async function fetchSavedRecipes() {
     );
     if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
     const rows = await response.json();
-    return rows.map(r => (r.recipes && r.recipes[0]) ? r.recipes[0] : null).filter(Boolean);
+    // recipes(*) is a to-one embed: PostgREST returns it as an object (or
+    // an array for to-many embeds) — normalize both shapes.
+    return rows.map(r => {
+        const rc = r.recipes;
+        if (!rc) return null;
+        return Array.isArray(rc) ? (rc[0] || null) : rc;
+    }).filter(Boolean);
 }
 
 async function fetchMyRecipes() {
