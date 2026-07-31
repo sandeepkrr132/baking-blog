@@ -3,7 +3,7 @@
     {
       "id": "chocolate-chip-cookies",
       "title": "Classic Chocolate Chip Cookies",
-      "image": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=800&h=600&fit=crop",
+      "image": "/images/chocolate-chip-cookies.jpg",
       "category": "cookies",
       "prepTime": 15,
       "cookTime": 12,
@@ -36,7 +36,7 @@
     {
       "id": "vanilla-cupcakes",
       "title": "Fluffy Vanilla Cupcakes",
-      "image": "https://images.unsplash.com/photo-1723638174646-5322cd088233?w=800&h=600&fit=crop",
+      "image": "/images/vanilla-cupcakes.jpg",
       "category": "cakes",
       "prepTime": 20,
       "cookTime": 20,
@@ -72,7 +72,7 @@
     {
       "id": "sourdough-bread",
       "title": "Rustic Sourdough Bread",
-      "image": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&h=600&fit=crop",
+      "image": "/images/sourdough-bread.jpg",
       "category": "bread",
       "prepTime": 30,
       "cookTime": 45,
@@ -102,7 +102,7 @@
     {
       "id": "banana-bread",
       "title": "Moist Banana Bread",
-      "image": "https://images.unsplash.com/photo-1675712843856-ba2cb7d33f3c?w=800&h=600&fit=crop",
+      "image": "/images/banana-bread.jpg",
       "category": "cakes",
       "prepTime": 15,
       "cookTime": 60,

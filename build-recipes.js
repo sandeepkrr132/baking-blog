@@ -35,6 +35,14 @@ function formatTime(seconds) {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
+// Resolve a relative path (e.g. /images/x.jpg) to an absolute URL for
+// OG/Twitter/JSON-LD meta tags. Social crawlers reject relative URLs.
+function absoluteUrl(url) {
+    if (!url) return url;
+    if (/^https?:\/\//i.test(url)) return url;
+    return SITE_URL + (url.startsWith('/') ? '' : '/') + url;
+}
+
 function escapeHtml(str) {
     return String(str)
         .replace(/&/g, '&amp;')
@@ -49,7 +57,7 @@ function buildJsonLd(recipe) {
         "@context": "https://schema.org",
         "@type": "Recipe",
         "name": recipe.title,
-        "image": [recipe.image],
+        "image": [absoluteUrl(recipe.image)],
         "description": recipe.description,
         "recipeCategory": recipe.category,
         "recipeYield": `${recipe.servings} servings`,
@@ -72,7 +80,7 @@ function buildJsonLd(recipe) {
     schema.keywords = [recipe.category, ...titleWords].join(', ');
 
     if (recipe.pinImage) {
-        schema.image.push(recipe.pinImage);
+        schema.image.push(absoluteUrl(recipe.pinImage));
     }
 
     return JSON.stringify(schema, null, 2);
@@ -85,7 +93,7 @@ function buildJsonLd(recipe) {
 function generateRecipeHTML(template, recipe) {
     const slug = recipe.id;
     const pageUrl = `${SITE_URL}/${slug}.html`;
-    const ogImage = recipe.pinImage || recipe.image;
+    const ogImage = absoluteUrl(recipe.pinImage || recipe.image);
 
     let html = template;
 
