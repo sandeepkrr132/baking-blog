@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signing in... | Sweet Crumbs</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .callback-page {
+            min-height: calc(100vh - 200px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .callback-card {
+            text-align: center;
+            padding: 3rem;
+        }
+        .callback-card h1 {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+        }
+        .callback-card p {
+            color: var(--color-text-light);
+        }
+        .callback-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--color-border);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .callback-error {
+            background: #FEE2E2;
+            color: #DC2626;
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🧁</span>
+                    <span class="logo-text">Sweet Crumbs</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="callback-page">
+        <div class="callback-card">
+            <div class="callback-spinner"></div>
+            <h1>Signing you in...</h1>
+            <p>Please wait while we complete your login.</p>
+            <div class="callback-error" id="errorBox" style="display:none"></div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        (async () => {
+            const PROD = 'https://baking-blog-three.vercel.app';
+            const errorBox = document.getElementById('errorBox');
+            try {
+                const user = await handleAuthCallback();
+                if (user) {
+                    window.location.href = PROD + '/index.html';
+                } else {
+                    errorBox.textContent = 'Login failed. Please try again.';
+                    errorBox.style.display = 'block';
+                    setTimeout(() => window.location.href = PROD + '/login.html', 3000);
+                }
+            } catch (err) {
+                console.error('Callback error:', err);
+                errorBox.textContent = 'Something went wrong. Redirecting...';
+                errorBox.style.display = 'block';
+                setTimeout(() => window.location.href = PROD + '/login.html', 3000);
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -36,7 +36,7 @@
     {
       "id": "vanilla-cupcakes",
       "title": "Fluffy Vanilla Cupcakes",
-      "image": "https://images.unsplash.com/photo-1519869325930-281384f7c6b4?w=800&h=600&fit=crop",
+      "image": "https://images.unsplash.com/photo-1723638174646-5322cd088233?w=800&h=600&fit=crop",
       "category": "cakes",
       "prepTime": 20,
       "cookTime": 20,
@@ -102,7 +102,7 @@
     {
       "id": "banana-bread",
       "title": "Moist Banana Bread",
-      "image": "https://images.unsplash.com/photo-1605090930600-41f68f44f71a?w=800&h=600&fit=crop",
+      "image": "https://images.unsplash.com/photo-1675712843856-ba2cb7d33f3c?w=800&h=600&fit=crop",
       "category": "cakes",
       "prepTime": 15,
       "cookTime": 60,

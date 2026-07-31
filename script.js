@@ -288,7 +288,7 @@ async function fetchRecipeById(id) {
 // ========================================
 function renderRecipeCards(recipesList, container) {
     container.innerHTML = recipesList.map(recipe => `
-        <article class="recipe-card" data-category="${recipe.category}" onclick="window.location.href='recipe.html?id=${recipe.id}'">
+        <article class="recipe-card" data-category="${recipe.category}" onclick="window.location.href='${recipe.id}.html'">
             <img src="${recipe.image}" alt="${recipe.title}" class="recipe-card-image" loading="lazy">
             <div class="recipe-card-content">
                 <span class="recipe-card-category">${recipe.category}</span>
@@ -354,7 +354,30 @@ async function loadRecipePage() {
 
     if (!heroSection || !ingredientsList || !stepsContainer) return;
 
-    // Get recipe ID from URL
+    // If page has embedded static data, use it directly (no Supabase fetch needed)
+    if (window.__RECIPE_DATA__) {
+        const recipe = window.__RECIPE_DATA__;
+        document.title = `${recipe.title} | Sweet Crumbs`;
+        populateJsonLd(recipe);
+        populateOgTags(recipe);
+
+        // Initialize timers from embedded data
+        if (recipe.__timers) {
+            recipe.__timers.forEach(t => {
+                timers[t.stepId] = {
+                    totalSeconds: t.totalSeconds,
+                    remaining: t.totalSeconds,
+                    running: false,
+                    finished: false,
+                    label: t.label,
+                    interval: null
+                };
+            });
+        }
+        return;
+    }
+
+    // Get recipe ID from URL (for development/fallback path)
     const params = new URLSearchParams(window.location.search);
     const recipeId = params.get('id');
 
