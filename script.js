@@ -261,7 +261,8 @@ function updateTimerDisplay(timerId) {
 // Fetch Recipes from Supabase
 // ========================================
 async function fetchRecipes() {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes?select=*`, {
+    // Homepage shows only public recipes (private ones are owner-only)
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes?select=*&visibility=eq.public`, {
         headers: {
             'apikey': SUPABASE_ANON_KEY,
             'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
@@ -272,10 +273,12 @@ async function fetchRecipes() {
 }
 
 async function fetchRecipeById(id) {
+    // Use the user's token when signed in so owners can read their private recipes
+    const token = getAccessToken() || SUPABASE_ANON_KEY;
     const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes?id=eq.${encodeURIComponent(id)}&select=*`, {
         headers: {
             'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            'Authorization': `Bearer ${token}`
         }
     });
     if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
@@ -284,14 +287,159 @@ async function fetchRecipeById(id) {
 }
 
 // ========================================
+// Authenticated API helpers
+// ========================================
+function getAuthHeaders() {
+    return {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${getAccessToken()}`
+    };
+}
+
+function isLoggedIn() {
+    return !!getAccessToken();
+}
+
+async function isRecipeSaved(recipeId) {
+    const user = await getCurrentUser();
+    if (!user) return false;
+    const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/saved_recipes?user_id=eq.${user.id}&recipe_id=eq.${encodeURIComponent(recipeId)}&select=recipe_id`,
+        { headers: getAuthHeaders() }
+    );
+    if (!response.ok) return false;
+    const data = await response.json();
+    return Array.isArray(data) && data.length > 0;
+}
+
+async function toggleSave(recipeId) {
+    const user = await getCurrentUser();
+    if (!user) {
+        window.location.href = 'login.html';
+        return false;
+    }
+    const saved = await isRecipeSaved(recipeId);
+    const url = `${SUPABASE_URL}/rest/v1/saved_recipes?user_id=eq.${user.id}&recipe_id=eq.${encodeURIComponent(recipeId)}`;
+    const response = saved
+        ? await fetch(url, { method: 'DELETE', headers: getAuthHeaders() })
+        : await fetch(`${SUPABASE_URL}/rest/v1/saved_recipes`, {
+            method: 'POST',
+            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: user.id, recipe_id: recipeId })
+        });
+    if (!response.ok) throw new Error('Failed to update saved state');
+    return !saved; // new saved state
+}
+
+async function fetchSavedRecipes() {
+    const user = await getCurrentUser();
+    if (!user) return [];
+    const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/saved_recipes?user_id=eq.${user.id}&select=recipe_id,recipes(*)&order=created_at.desc`,
+        { headers: getAuthHeaders() }
+    );
+    if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
+    const rows = await response.json();
+    return rows.map(r => (r.recipes && r.recipes[0]) ? r.recipes[0] : null).filter(Boolean);
+}
+
+async function fetchMyRecipes() {
+    const user = await getCurrentUser();
+    if (!user) return [];
+    const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/recipes?created_by=eq.${user.id}&order=created_at.desc&select=*`,
+        { headers: getAuthHeaders() }
+    );
+    if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
+    return await response.json();
+}
+
+function slugify(title) {
+    return String(title || 'recipe').toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 50) || 'recipe';
+}
+
+async function createRecipe(payload) {
+    const user = await getCurrentUser();
+    if (!user) {
+        window.location.href = 'login.html';
+        return null;
+    }
+    const id = `${slugify(payload.title)}-${Date.now().toString(36).slice(-4)}-${Math.random().toString(36).slice(2, 6)}`;
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes`, {
+        method: 'POST',
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+        body: JSON.stringify({ ...payload, id, created_by: user.id })
+    });
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'Failed to create recipe');
+    }
+    const data = await response.json();
+    return Array.isArray(data) ? data[0] : data;
+}
+
+async function updateRecipe(id, payload) {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes?id=eq.${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+        body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'Failed to update recipe');
+    }
+    const data = await response.json();
+    return Array.isArray(data) ? data[0] : data;
+}
+
+async function deleteRecipe(id) {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes?id=eq.${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to delete recipe');
+    return true;
+}
+
+async function uploadRecipeImage(file) {
+    const user = await getCurrentUser();
+    if (!user) throw new Error('Not logged in');
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
+    const path = `${user.id}/${Date.now()}-${safeName}`;
+    const response = await fetch(`${SUPABASE_URL}/storage/v1/object/recipe-images/${path}`, {
+        method: 'POST',
+        headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${getAccessToken()}`,
+            'Content-Type': file.type || 'application/octet-stream',
+            'x-upsert': 'true'
+        },
+        body: file
+    });
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'Failed to upload image');
+    }
+    return `${SUPABASE_URL}/storage/v1/object/public/recipe-images/${path}`;
+}
+
+// ========================================
 // Render Recipe Cards (Homepage)
 // ========================================
 function renderRecipeCards(recipesList, container) {
-    container.innerHTML = recipesList.map(recipe => `
-        <article class="recipe-card" data-category="${recipe.category}" onclick="window.location.href='${recipe.id}.html'">
+    container.innerHTML = recipesList.map(recipe => {
+        // User-created recipes have no static page; route them to the dynamic view
+        const href = recipe.created_by
+            ? `recipe.html?id=${encodeURIComponent(recipe.id)}`
+            : `${recipe.id}.html`;
+        return `
+        <article class="recipe-card" data-category="${recipe.category}" onclick="window.location.href='${href}'">
             <img src="${recipe.image}" alt="${recipe.title}" class="recipe-card-image" loading="lazy">
             <div class="recipe-card-content">
-                <span class="recipe-card-category">${recipe.category}</span>
+                <span class="recipe-card-category">${recipe.category}${recipe.visibility === 'private' ? ' · Private' : ''}</span>
                 <h3 class="recipe-card-title">${recipe.title}</h3>
                 <p class="recipe-card-description">${recipe.description}</p>
                 <div class="recipe-card-meta">
@@ -301,7 +449,62 @@ function renderRecipeCards(recipesList, container) {
                 </div>
             </div>
         </article>
+    `;
+    }).join('');
+}
+
+// ========================================
+// My Recipes cards (with Edit / Delete actions)
+// ========================================
+function renderMyRecipeCards(recipesList, container) {
+    container.innerHTML = recipesList.map(recipe => `
+        <article class="recipe-card" data-category="${recipe.category}">
+            <img src="${recipe.image}" alt="${recipe.title}" class="recipe-card-image" loading="lazy">
+            <div class="recipe-card-content">
+                <span class="recipe-card-category">${recipe.category}${recipe.visibility === 'private' ? ' · Private' : ''}</span>
+                <h3 class="recipe-card-title">${recipe.title}</h3>
+                <p class="recipe-card-description">${recipe.description}</p>
+                <div class="recipe-card-meta">
+                    <span>⏱️ ${recipe.prepTime + recipe.cookTime} min</span>
+                    <span>👥 ${recipe.servings} servings</span>
+                    <span>📊 ${recipe.difficulty}</span>
+                </div>
+                <div class="my-recipe-actions">
+                    <a href="create-recipe.html?id=${encodeURIComponent(recipe.id)}" class="btn btn-secondary my-action-btn">Edit</a>
+                    <button class="btn my-action-btn my-action-delete" onclick="handleDeleteRecipe('${recipe.id}')">Delete</button>
+                </div>
+            </div>
+        </article>
     `).join('');
+}
+
+async function handleDeleteRecipe(id) {
+    if (!confirm('Delete this recipe? This cannot be undone.')) return;
+    try {
+        await deleteRecipe(id);
+        showToast('Recipe deleted');
+        await refreshMyRecipes();
+    } catch (err) {
+        console.error(err);
+        showToast('Could not delete recipe');
+    }
+}
+
+async function refreshMyRecipes() {
+    const grid = document.getElementById('recipeGrid');
+    const empty = document.getElementById('emptyState');
+    if (!grid) return;
+    const user = await getCurrentUser();
+    if (!user) { window.location.href = 'login.html'; return; }
+    const mine = await fetchMyRecipes();
+    if (!mine.length) {
+        grid.style.display = 'none';
+        if (empty) empty.style.display = 'block';
+    } else {
+        grid.style.display = '';
+        if (empty) empty.style.display = 'none';
+        renderMyRecipeCards(mine, grid);
+    }
 }
 
 // ========================================
@@ -324,6 +527,43 @@ function setupCategoryFilter(container) {
             renderRecipeCards(filtered, container);
         });
     });
+}
+
+// ========================================
+// Save button (recipe pages)
+// ========================================
+async function initSaveButton(recipeId) {
+    const btn = document.getElementById('saveRecipeBtn');
+    if (!btn || !recipeId) return;
+    btn.dataset.recipeId = recipeId;
+
+    const user = await getCurrentUser();
+    if (!user) {
+        btn.innerHTML = '♡ Save';
+        btn.disabled = false;
+        btn.onclick = () => { window.location.href = 'login.html'; };
+        return;
+    }
+
+    const saved = await isRecipeSaved(recipeId);
+    btn.classList.toggle('saved', saved);
+    btn.innerHTML = saved ? '♥ Saved' : '♡ Save';
+    btn.disabled = false;
+
+    btn.onclick = async () => {
+        btn.disabled = true;
+        try {
+            const nowSaved = await toggleSave(recipeId);
+            btn.classList.toggle('saved', nowSaved);
+            btn.innerHTML = nowSaved ? '♥ Saved' : '♡ Save';
+            showToast(nowSaved ? 'Saved to your recipes!' : 'Removed from saved recipes');
+        } catch (err) {
+            console.error(err);
+            showToast('Could not update saved state');
+        } finally {
+            btn.disabled = false;
+        }
+    };
 }
 
 // ========================================
@@ -374,6 +614,7 @@ async function loadRecipePage() {
                 };
             });
         }
+        initSaveButton(recipe.id);
         return;
     }
 
@@ -428,6 +669,7 @@ async function loadRecipePage() {
                         </div>
                     </div>
                 </div>
+                <button id="saveRecipeBtn" class="save-btn" disabled>♡ Save</button>
             </div>
         `;
 
@@ -482,6 +724,8 @@ async function loadRecipePage() {
                 </div>
             `;
         }).join('');
+
+        initSaveButton(recipe.id);
     } catch (err) {
         console.error('Failed to load recipe:', err);
         heroSection.innerHTML = '<p class="loading">Failed to load recipe. Please try again later.</p>';
@@ -539,6 +783,9 @@ async function renderAuthNav() {
             const name = meta.full_name || meta.name || user.email.split('@')[0];
             const avatar = meta.avatar_url || meta.picture || null;
             navEl.innerHTML = `
+                <a href="saved.html" class="nav-link">Saved</a>
+                <a href="my-recipes.html" class="nav-link">My Recipes</a>
+                <a href="create-recipe.html" class="nav-link">+ Create</a>
                 <div class="user-menu" style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;position:relative;">
                     ${avatar
                         ? `<img src="${avatar}" alt="${name}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">`

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Recipes | Sweet Crumbs</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .page-section {
+            padding: 3rem 1rem;
+        }
+        .page-title {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            color: var(--color-text);
+            margin-bottom: 0.5rem;
+        }
+        .page-subtitle {
+            color: var(--color-text-light);
+            margin-bottom: 2rem;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--color-text-light);
+        }
+        .empty-state h3 {
+            font-family: var(--font-heading);
+            color: var(--color-text);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🧁</span>
+                    <span class="logo-text">Sweet Crumbs</span>
+                </a>
+                <nav class="nav">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="index.html#recipes" class="nav-link">Recipes</a>
+                    <span id="authNav"></span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-section">
+        <div class="container">
+            <h1 class="page-title">Saved Recipes</h1>
+            <p class="page-subtitle">Recipes you've bookmarked for later.</p>
+            <div class="grid" id="recipeGrid">
+                <p class="loading">Loading saved recipes...</p>
+            </div>
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <h3>No saved recipes yet</h3>
+                <p>Browse the homepage and tap the ♡ Save button on any recipe.</p>
+                <a href="index.html#recipes" class="btn btn-primary" style="margin-top:1rem;display:inline-block;">Browse Recipes</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Sweet Crumbs Baking Blog. Happy Baking! 🍪</p>
+        </div>
+    </footer>
+
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+    <script>
+        (async () => {
+            const grid = document.getElementById('recipeGrid');
+            const empty = document.getElementById('emptyState');
+
+            const user = await checkSession();
+            if (!user) { window.location.href = 'login.html'; return; }
+
+            try {
+                const saved = await fetchSavedRecipes();
+                if (!saved.length) {
+                    grid.style.display = 'none';
+                    empty.style.display = 'block';
+                    return;
+                }
+                renderRecipeCards(saved, grid);
+            } catch (err) {
+                console.error(err);
+                grid.innerHTML = '<p class="loading">Failed to load saved recipes.</p>';
+            }
+        })();
+    </script>
+</body>
+</html>

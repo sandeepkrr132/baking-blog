@@ -6,6 +6,13 @@ const SUPABASE_URL = 'https://bynfesgbvgcmkpnwysil.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5bmZlc2didmdjbWtwbnd5c2lsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwMTI4NzMsImV4cCI6MjEwMDU4ODg3M30.SrevjTSZq231d9PCfQAs_gOvykeJ9a0j5-NwAui7esk';
 
 // ========================================
+// Access token for authenticated API calls
+// ========================================
+function getAccessToken() {
+    return localStorage.getItem('sb-access-token');
+}
+
+// ========================================
 // Sign in with Google
 // ========================================
 async function signInWithGoogleProvider() {

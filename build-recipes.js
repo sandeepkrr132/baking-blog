@@ -166,6 +166,7 @@ function generateRecipeHTML(template, recipe) {
                     </div>
                 </div>
             </div>
+            <button id="saveRecipeBtn" class="save-btn" disabled>♡ Save</button>
         </div>`;
 
     html = html.replace('<!-- Recipe content loaded by JavaScript -->', heroHtml);

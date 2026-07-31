@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Recipe | Sweet Crumbs</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .form-page {
+            padding: 3rem 1rem;
+        }
+        .form-card {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 2.5rem;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+        .form-card h1 {
+            font-family: var(--font-heading);
+            font-size: 2.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .form-card > p {
+            color: var(--color-text-light);
+            margin-bottom: 2rem;
+        }
+        .field-group {
+            margin-bottom: 1.25rem;
+        }
+        .field-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.375rem;
+            font-size: 0.9rem;
+            color: var(--color-text);
+        }
+        .field-group input[type="text"],
+        .field-group input[type="email"],
+        .field-group input[type="number"],
+        .field-group input[type="password"],
+        .field-group select,
+        .field-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-family: var(--font-body);
+            color: var(--color-text);
+            background: var(--color-bg);
+            transition: border-color 0.2s;
+        }
+        .field-group input:focus,
+        .field-group select:focus,
+        .field-group textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+        .visibility-toggle {
+            display: flex;
+            gap: 1rem;
+        }
+        .visibility-option {
+            flex: 1;
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 0.875rem 1rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            background: var(--color-bg);
+        }
+        .visibility-option.selected {
+            border-color: var(--color-primary);
+            background: var(--color-bg-alt);
+            box-shadow: var(--shadow-sm);
+        }
+        .visibility-option strong {
+            display: block;
+            font-size: 0.95rem;
+        }
+        .visibility-option small {
+            color: var(--color-text-light);
+        }
+        .dynamic-list {
+            margin-bottom: 1rem;
+        }
+        .dynamic-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: flex-start;
+        }
+        .dynamic-row input,
+        .dynamic-row textarea {
+            flex: 1;
+            padding: 0.65rem 0.875rem;
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-family: var(--font-body);
+            color: var(--color-text);
+            background: var(--color-bg);
+        }
+        .dynamic-row input:focus,
+        .dynamic-row textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+        .dynamic-row .ing-amount {
+            flex: 0 0 130px;
+        }
+        .step-row {
+            flex-wrap: wrap;
+        }
+        .step-row .step-text {
+            flex: 1 1 100%;
+        }
+        .step-row .step-timer {
+            display: flex;
+            gap: 0.5rem;
+            flex: 1;
+        }
+        .step-row .step-timer input {
+            flex: 1;
+        }
+        .row-remove {
+            flex: 0 0 auto;
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: #FEE2E2;
+            color: #DC2626;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .add-row-btn {
+            border: 2px dashed var(--color-border);
+            background: var(--color-bg);
+            color: var(--color-primary);
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            padding: 0.6rem 1rem;
+            cursor: pointer;
+            width: 100%;
+        }
+        .add-row-btn:hover {
+            border-color: var(--color-primary);
+            background: var(--color-bg-alt);
+        }
+        .image-picker {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .image-preview {
+            width: 120px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--color-border);
+            background: var(--color-bg);
+        }
+        .file-input-btn {
+            padding: 0.65rem 1.25rem;
+            border: 2px solid var(--color-primary);
+            color: var(--color-primary);
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            background: var(--color-white);
+            cursor: pointer;
+        }
+        .file-input-btn:hover {
+            background: var(--color-bg-alt);
+        }
+        .image-status {
+            color: var(--color-text-light);
+            font-size: 0.85rem;
+        }
+        .form-error {
+            background: #FEE2E2;
+            color: #DC2626;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .form-success {
+            background: #E8F5E9;
+            color: #2E7D32;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+        .submit-row {
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        @media (max-width: 640px) {
+            .form-row, .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🧁</span>
+                    <span class="logo-text">Sweet Crumbs</span>
+                </a>
+                <nav class="nav">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="index.html#recipes" class="nav-link">Recipes</a>
+                    <span id="authNav"></span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="form-page">
+        <div class="form-card">
+            <h1 id="formTitle">Create Recipe</h1>
+            <p id="formSubtitle">Share your bake with the community — or keep it private.</p>
+
+            <div class="form-error" id="formError"></div>
+            <div class="form-success" id="formSuccess"></div>
+
+            <form id="recipeForm" onsubmit="handleSubmit(event)">
+                <div class="field-group">
+                    <label for="title">Recipe Title *</label>
+                    <input type="text" id="title" required placeholder="e.g. Blueberry Muffins">
+                </div>
+
+                <div class="form-row">
+                    <div class="field-group">
+                        <label for="category">Category</label>
+                        <select id="category">
+                            <option value="cookies">Cookies</option>
+                            <option value="cakes">Cakes</option>
+                            <option value="bread">Bread</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label for="difficulty">Difficulty</label>
+                        <select id="difficulty">
+                            <option value="Easy">Easy</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row-3">
+                    <div class="field-group">
+                        <label for="prepTime">Prep Time (min)</label>
+                        <input type="number" id="prepTime" min="0" value="15">
+                    </div>
+                    <div class="field-group">
+                        <label for="cookTime">Cook Time (min)</label>
+                        <input type="number" id="cookTime" min="0" value="30">
+                    </div>
+                    <div class="field-group">
+                        <label for="servings">Servings</label>
+                        <input type="number" id="servings" min="1" value="8">
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>Visibility</label>
+                    <div class="visibility-toggle">
+                        <div class="visibility-option selected" id="visPublic" onclick="selectVisibility('public')">
+                            <strong>🌍 Public</strong>
+                            <small>Visible to everyone on the homepage</small>
+                        </div>
+                        <div class="visibility-option" id="visPrivate" onclick="selectVisibility('private')">
+                            <strong>🔒 Private</strong>
+                            <small>Only you can see it</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>Photo</label>
+                    <div class="image-picker">
+                        <img id="imagePreview" class="image-preview" alt="Recipe photo">
+                        <div>
+                            <input type="file" id="imageFile" accept="image/*" style="display:none;">
+                            <button type="button" class="file-input-btn" onclick="document.getElementById('imageFile').click()">Upload Photo</button>
+                            <div class="image-status" id="imageStatus">No photo uploaded (a placeholder will be used).</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" rows="3" placeholder="A short, appetizing summary..."></textarea>
+                </div>
+
+                <div class="field-group">
+                    <label>Ingredients</label>
+                    <div class="dynamic-list" id="ingredientsList"></div>
+                    <button type="button" class="add-row-btn" onclick="addIngredientRow()">+ Add Ingredient</button>
+                </div>
+
+                <div class="field-group">
+                    <label>Steps</label>
+                    <div class="dynamic-list" id="stepsList"></div>
+                    <button type="button" class="add-row-btn" onclick="addStepRow()">+ Add Step</button>
+                </div>
+
+                <div class="submit-row">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Create Recipe</button>
+                    <a href="my-recipes.html" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Sweet Crumbs Baking Blog. Happy Baking! 🍪</p>
+        </div>
+    </footer>
+
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const PLACEHOLDER_IMAGE = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Crect width='100%25' height='100%25' fill='%23E8DDD0'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='28' fill='%236B5B50' text-anchor='middle'%3ENo photo%3C/text%3E%3C/svg%3E";
+
+        let editId = null;
+        let imageUrl = null;
+        let visibility = 'public';
+        let currentUser = null;
+
+        function selectVisibility(v) {
+            visibility = v;
+            document.getElementById('visPublic').classList.toggle('selected', v === 'public');
+            document.getElementById('visPrivate').classList.toggle('selected', v === 'private');
+        }
+
+        function addIngredientRow(amount = '', name = '') {
+            const div = document.createElement('div');
+            div.className = 'dynamic-row';
+            div.innerHTML = `
+                <input type="text" class="ing-amount" placeholder="Amount" value="${escapeAttr(amount)}">
+                <input type="text" class="ing-name" placeholder="Ingredient" value="${escapeAttr(name)}">
+                <button type="button" class="row-remove" onclick="removeRow(this)" title="Remove">✕</button>`;
+            document.getElementById('ingredientsList').appendChild(div);
+        }
+
+        function addStepRow(text = '', minutes = '', label = '') {
+            const div = document.createElement('div');
+            div.className = 'dynamic-row step-row';
+            div.innerHTML = `
+                <textarea class="step-text" rows="2" placeholder="Step description">${escapeHtml(text)}</textarea>
+                <div class="step-timer">
+                    <input type="number" class="step-minutes" min="0" placeholder="Timer min (optional)" value="${escapeAttr(minutes)}">
+                    <input type="text" class="step-label" placeholder="Timer label (optional)" value="${escapeAttr(label)}">
+                </div>
+                <button type="button" class="row-remove" onclick="removeRow(this)" title="Remove">✕</button>`;
+            document.getElementById('stepsList').appendChild(div);
+        }
+
+        function removeRow(btn) {
+            btn.closest('.dynamic-row').remove();
+        }
+
+        function escapeHtml(str) {
+            return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+        function escapeAttr(str) {
+            return escapeHtml(str).replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        async function handleImageUpload(file) {
+            const status = document.getElementById('imageStatus');
+            const preview = document.getElementById('imagePreview');
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                status.textContent = 'Please choose an image file.';
+                return;
+            }
+            status.textContent = 'Uploading...';
+            try {
+                const url = await uploadRecipeImage(file);
+                imageUrl = url;
+                preview.src = url;
+                status.textContent = 'Photo uploaded ✓';
+            } catch (err) {
+                console.error(err);
+                status.textContent = 'Upload failed. You can still save with a placeholder.';
+            }
+        }
+
+        async function loadEditMode(id) {
+            const recipe = await fetchRecipeById(id);
+            if (!recipe) {
+                showFormError('Recipe not found.');
+                return;
+            }
+            if (!currentUser || recipe.created_by !== currentUser.id) {
+                showFormError('You can only edit your own recipes.');
+                return;
+            }
+            editId = id;
+            document.getElementById('formTitle').textContent = 'Edit Recipe';
+            document.getElementById('formSubtitle').textContent = 'Update your recipe below.';
+            document.getElementById('submitBtn').textContent = 'Save Changes';
+
+            document.getElementById('title').value = recipe.title || '';
+            document.getElementById('category').value = recipe.category || 'other';
+            document.getElementById('difficulty').value = recipe.difficulty || 'Easy';
+            document.getElementById('prepTime').value = recipe.prepTime ?? 15;
+            document.getElementById('cookTime').value = recipe.cookTime ?? 30;
+            document.getElementById('servings').value = recipe.servings ?? 8;
+            document.getElementById('description').value = recipe.description || '';
+
+            selectVisibility(recipe.visibility === 'private' ? 'private' : 'public');
+
+            if (recipe.image && !recipe.image.startsWith('data:')) {
+                imageUrl = recipe.image;
+                document.getElementById('imagePreview').src = recipe.image;
+                document.getElementById('imageStatus').textContent = 'Current photo. Upload a new one to replace it.';
+            }
+
+            (recipe.ingredients || []).forEach(ing => addIngredientRow(ing.amount, ing.name));
+            if (!recipe.ingredients || !recipe.ingredients.length) addIngredientRow();
+            (recipe.steps || []).forEach(s => addStepRow(s.text, s.timerMinutes || '', s.timerLabel || ''));
+            if (!recipe.steps || !recipe.steps.length) addStepRow();
+        }
+
+        function showFormError(msg) {
+            const el = document.getElementById('formError');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            const errorEl = document.getElementById('formError');
+            errorEl.style.display = 'none';
+            const btn = document.getElementById('submitBtn');
+
+            const title = document.getElementById('title').value.trim();
+            if (!title) { showFormError('Please add a title.'); return; }
+
+            const ingredients = [...document.querySelectorAll('#ingredientsList .dynamic-row')]
+                .map(r => ({
+                    amount: r.querySelector('.ing-amount').value.trim(),
+                    name: r.querySelector('.ing-name').value.trim()
+                }))
+                .filter(i => i.amount || i.name);
+            if (!ingredients.length) { showFormError('Add at least one ingredient.'); return; }
+
+            const steps = [...document.querySelectorAll('#stepsList .dynamic-row')]
+                .map(r => {
+                    const text = r.querySelector('.step-text').value.trim();
+                    const minutes = parseInt(r.querySelector('.step-minutes').value, 10);
+                    const label = r.querySelector('.step-label').value.trim();
+                    return {
+                        text,
+                        timerMinutes: minutes > 0 ? minutes : null,
+                        timerLabel: minutes > 0 ? (label || null) : null
+                    };
+                })
+                .filter(s => s.text);
+            if (!steps.length) { showFormError('Add at least one step.'); return; }
+
+            const payload = {
+                title,
+                category: document.getElementById('category').value,
+                difficulty: document.getElementById('difficulty').value,
+                prepTime: parseInt(document.getElementById('prepTime').value, 10) || 0,
+                cookTime: parseInt(document.getElementById('cookTime').value, 10) || 0,
+                servings: parseInt(document.getElementById('servings').value, 10) || 1,
+                description: document.getElementById('description').value.trim(),
+                image: imageUrl || PLACEHOLDER_IMAGE,
+                visibility,
+                ingredients,
+                steps
+            };
+
+            btn.disabled = true;
+            btn.textContent = editId ? 'Saving...' : 'Creating...';
+            try {
+                if (editId) {
+                    await updateRecipe(editId, payload);
+                    window.location.href = `recipe.html?id=${encodeURIComponent(editId)}`;
+                } else {
+                    const created = await createRecipe(payload);
+                    window.location.href = `recipe.html?id=${encodeURIComponent(created.id)}`;
+                }
+            } catch (err) {
+                console.error(err);
+                showFormError(err.message || 'Failed to save recipe.');
+                btn.disabled = false;
+                btn.textContent = editId ? 'Save Changes' : 'Create Recipe';
+            }
+        }
+
+        (async () => {
+            currentUser = await checkSession();
+            if (!currentUser) { window.location.href = 'login.html'; return; }
+
+            document.getElementById('imageFile').addEventListener('change', e => {
+                handleImageUpload(e.target.files[0]);
+            });
+
+            // seed one empty ingredient + step row for easy starts
+            addIngredientRow();
+            addStepRow();
+
+            const params = new URLSearchParams(window.location.search);
+            const editIdParam = params.get('id');
+            if (editIdParam) {
+                try {
+                    await loadEditMode(editIdParam);
+                } catch (err) {
+                    console.error(err);
+                    showFormError('Could not load recipe for editing.');
+                }
+            }
+        })();
+    </script>
+</body>
+</html>

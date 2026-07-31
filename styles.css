@@ -368,6 +368,70 @@ h2 {
     margin-bottom: 1.5rem;
 }
 
+.save-btn {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    background: var(--color-white);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.save-btn:hover:not(:disabled) {
+    background: var(--color-bg-alt);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.save-btn.saved {
+    background: var(--color-primary);
+    color: var(--color-white);
+}
+
+.save-btn.saved:hover:not(:disabled) {
+    background: var(--color-primary-dark);
+}
+
+.save-btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.my-recipe-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.my-action-btn {
+    flex: 1;
+    text-align: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.my-action-delete {
+    background: #FEE2E2;
+    color: #DC2626;
+}
+
+.my-action-delete:hover {
+    background: #FECACA;
+}
+
 .recipe-meta {
     display: flex;
     gap: 2rem;
