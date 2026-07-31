@@ -65,7 +65,7 @@
                 <a href="create-recipe.html" class="btn btn-primary">+ Create Recipe</a>
             </div>
             <p class="page-subtitle">Your creations — public recipes appear on the homepage, private ones stay just for you.</p>
-            <div class="grid" id="recipeGrid">
+            <div class="grid" id="myRecipesGrid">
                 <p class="loading">Loading your recipes...</p>
             </div>
             <div class="empty-state" id="emptyState" style="display:none;">
@@ -92,7 +92,7 @@
                 await refreshMyRecipes();
             } catch (err) {
                 console.error(err);
-                document.getElementById('recipeGrid').innerHTML = '<p class="loading">Failed to load your recipes.</p>';
+                document.getElementById('myRecipesGrid').innerHTML = '<p class="loading">Failed to load your recipes.</p>';
             }
         })();
     </script>

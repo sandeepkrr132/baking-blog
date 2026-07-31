@@ -490,7 +490,7 @@ async function handleDeleteRecipe(id) {
 }
 
 async function refreshMyRecipes() {
-    const grid = document.getElementById('recipeGrid');
+    const grid = document.getElementById('myRecipesGrid');
     const empty = document.getElementById('emptyState');
     if (!grid) return;
     const user = await getCurrentUser();

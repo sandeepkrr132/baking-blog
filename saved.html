@@ -55,7 +55,7 @@
         <div class="container">
             <h1 class="page-title">Saved Recipes</h1>
             <p class="page-subtitle">Recipes you've bookmarked for later.</p>
-            <div class="grid" id="recipeGrid">
+            <div class="grid" id="savedRecipesGrid">
                 <p class="loading">Loading saved recipes...</p>
             </div>
             <div class="empty-state" id="emptyState" style="display:none;">
@@ -76,7 +76,7 @@
     <script src="script.js"></script>
     <script>
         (async () => {
-            const grid = document.getElementById('recipeGrid');
+            const grid = document.getElementById('savedRecipesGrid');
             const empty = document.getElementById('emptyState');
 
             const user = await checkSession();
