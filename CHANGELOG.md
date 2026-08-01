@@ -5,6 +5,35 @@ Stack: static vanilla HTML/CSS/JS on Vercel + Supabase (`bynfesgbvgcmkpnwysil`)
 
 ---
 
+## [2026-08-01] Auth fix (migrate to supabase-js) + Create Recipe wizard
+
+### Auth / JWT fix — root cause
+Signed-in features ("Failed to load your recipes", "JWT expired" on the create form, failed photo uploads, "Could not update saved state") were all the same bug: the site hand-rolled JWT handling in `auth.js` (raw `fetch` + `localStorage` `sb-access-token`/`sb-refresh-token`) and **never refreshed expired tokens**. GoTrue rejects an expired token on `/auth/v1/user` with **HTTP 403**, but the refresh-on-failure code only checked for **401**, so it silently fell back to decoding the dead JWT — the UI thought you were logged in while every authenticated REST call failed with `JWT expired`. Confirmed via Supabase auth logs: dozens of `bad_jwt` 403s on `/user`, zero successful refresh grants.
+
+- **`supabase.js` (new)** — vendored `@supabase/supabase-js` **2.111.0** UMD bundle (global `supabase`), so a no-build static site gets the official client without a CDN dependency.
+- **`auth.js`** — rewritten around `supabase.createClient({ auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true } })`. The client now owns access-token refresh + rotation, session persistence, and `onAuthStateChange` (redirect to login only on a genuine `SIGNED_OUT` on a protected page; `TOKEN_REFRESHED` is silent). `getCurrentUser()` uses `getUser()` (server-verified). Old legacy token keys are cleared.
+- **`script.js`** — every data/storage call converted to `supabaseClient.from(...)` / `.storage.from(...)`, which attach the session token and refresh+retry on 401. Added `redirectIfSignedOut()` so only a genuinely invalid session sends users to login; transient failures show a friendly message.
+- **`login.html` / `auth-callback.html`** — use the client's `signInWithPassword` / `signUp` / `signInWithOAuth` and `getSession()` for the OAuth callback.
+- All pages (incl. the 4 regenerated static recipe pages) load `supabase.js` before `auth.js`.
+- Users sign in once more after this deploy (old tokens can't be ported).
+
+### Create Recipe redesigned as a 6-step wizard
+`create-recipe.html` is now a step-by-step flow instead of one long form:
+
+1. **Basics** — title, category, difficulty
+2. **Details** — prep/cook time, servings, public/private
+3. **Photo & Description** — upload + description
+4. **Ingredients** — dynamic rows
+5. **Steps** — dynamic rows with optional timer (min + label)
+6. **Review & Create** — summary of everything entered + the Create Recipe button
+
+Includes a stepper progress bar ("Step 3 of 6"), Back/Next with **per-step validation** (no moving on without a title/ingredients/steps), and all entered data preserved when navigating back. Edit mode (`?id=…`) prefills the wizard. Same warm/cream Sweet Crumbs styling.
+
+### Tooling
+- **`_e2e.js`** updated for the new auth + wizard: logs in through the real login UI (the old localStorage token injection no longer applies) and walks the wizard for create/edit.
+
+---
+
 ## [2026-07-31] Saved Recipes + User-Created Recipes
 
 Signed-in users can now **save/favorite recipes** and **create, edit, and delete their own recipes**, with per-recipe **public/private** visibility and **image upload** to Supabase Storage. This is the groundwork for a future paid/selling layer — the ownership + visibility model is structured so a `price` field can be added without restructuring.

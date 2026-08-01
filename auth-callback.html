@@ -66,14 +66,19 @@
         </div>
     </div>
 
+    <script src="supabase.js"></script>
     <script src="auth.js"></script>
     <script>
         (async () => {
             const PROD = 'https://baking-blog-three.vercel.app';
             const errorBox = document.getElementById('errorBox');
             try {
-                const user = await handleAuthCallback();
-                if (user) {
+                // detectSessionInUrl captured the OAuth tokens/code when the
+                // client initialized; getSession() finishes the PKCE exchange
+                // (if applicable) and returns the stored session.
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error) throw error;
+                if (session) {
                     window.location.href = PROD + '/index.html';
                 } else {
                     errorBox.textContent = 'Login failed. Please try again.';

@@ -82,6 +82,7 @@
         </div>
     </footer>
 
+    <script src="supabase.js"></script>
     <script src="auth.js"></script>
     <script src="script.js"></script>
     <script>
@@ -92,6 +93,9 @@
                 await refreshMyRecipes();
             } catch (err) {
                 console.error(err);
+                // Only a genuinely invalid session sends the user to login;
+                // transient/refreshable failures show the friendly message.
+                if (await redirectIfSignedOut()) return;
                 document.getElementById('myRecipesGrid').innerHTML = '<p class="loading">Failed to load your recipes.</p>';
             }
         })();

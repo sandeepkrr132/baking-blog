@@ -260,55 +260,59 @@ function updateTimerDisplay(timerId) {
 // ========================================
 // Fetch Recipes from Supabase
 // ========================================
+// All data calls go through supabaseClient, which attaches the session's
+// access token and refreshes it automatically when expired (with a retry).
 async function fetchRecipes() {
     // Homepage shows only public recipes (private ones are owner-only)
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes?select=*&visibility=eq.public`, {
-        headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-        }
-    });
-    if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
-    return await response.json();
+    const { data, error } = await supabaseClient
+        .from('recipes')
+        .select('*')
+        .eq('visibility', 'public');
+    if (error) throw new Error(`Supabase error: ${error.message}`);
+    return data || [];
 }
 
 async function fetchRecipeById(id) {
-    // Use the user's token when signed in so owners can read their private recipes
-    const token = getAccessToken() || SUPABASE_ANON_KEY;
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes?id=eq.${encodeURIComponent(id)}&select=*`, {
-        headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${token}`
-        }
-    });
-    if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
-    const data = await response.json();
-    return data[0] || null;
+    // Uses the signed-in session when available so owners can read their private recipes
+    const { data, error } = await supabaseClient
+        .from('recipes')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+    if (error) throw new Error(`Supabase error: ${error.message}`);
+    return data || null;
 }
 
 // ========================================
-// Authenticated API helpers
+// Session helpers
 // ========================================
-function getAuthHeaders() {
-    return {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${getAccessToken()}`
-    };
+async function isLoggedIn() {
+    const { data } = await supabaseClient.auth.getSession();
+    return !!data?.session;
 }
 
-function isLoggedIn() {
-    return !!getAccessToken();
+// If the session is genuinely gone (refresh failed), send the user to log in.
+// Transient failures are retried by the client internally, so reaching this
+// helper means the request really failed — verify once more whether we still
+// have a valid user before surfacing a generic error.
+async function redirectIfSignedOut() {
+    const user = await getCurrentUser();
+    if (!user) {
+        window.location.href = 'login.html';
+        return true;
+    }
+    return false;
 }
 
 async function isRecipeSaved(recipeId) {
     const user = await getCurrentUser();
     if (!user) return false;
-    const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/saved_recipes?user_id=eq.${user.id}&recipe_id=eq.${encodeURIComponent(recipeId)}&select=recipe_id`,
-        { headers: getAuthHeaders() }
-    );
-    if (!response.ok) return false;
-    const data = await response.json();
+    const { data, error } = await supabaseClient
+        .from('saved_recipes')
+        .select('recipe_id')
+        .eq('user_id', user.id)
+        .eq('recipe_id', recipeId);
+    if (error) return false;
     return Array.isArray(data) && data.length > 0;
 }
 
@@ -319,27 +323,32 @@ async function toggleSave(recipeId) {
         return false;
     }
     const saved = await isRecipeSaved(recipeId);
-    const url = `${SUPABASE_URL}/rest/v1/saved_recipes?user_id=eq.${user.id}&recipe_id=eq.${encodeURIComponent(recipeId)}`;
-    const response = saved
-        ? await fetch(url, { method: 'DELETE', headers: getAuthHeaders() })
-        : await fetch(`${SUPABASE_URL}/rest/v1/saved_recipes`, {
-            method: 'POST',
-            headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: user.id, recipe_id: recipeId })
-        });
-    if (!response.ok) throw new Error('Failed to update saved state');
+    let error;
+    if (saved) {
+        ({ error } = await supabaseClient
+            .from('saved_recipes')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('recipe_id', recipeId));
+    } else {
+        ({ error } = await supabaseClient
+            .from('saved_recipes')
+            .insert({ user_id: user.id, recipe_id: recipeId }));
+    }
+    if (error) throw new Error('Failed to update saved state');
     return !saved; // new saved state
 }
 
 async function fetchSavedRecipes() {
     const user = await getCurrentUser();
     if (!user) return [];
-    const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/saved_recipes?user_id=eq.${user.id}&select=recipe_id,recipes(*)&order=created_at.desc`,
-        { headers: getAuthHeaders() }
-    );
-    if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
-    const rows = await response.json();
+    const { data, error } = await supabaseClient
+        .from('saved_recipes')
+        .select('recipe_id,recipes(*)')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+    if (error) throw new Error(`Supabase error: ${error.message}`);
+    const rows = data || [];
     // recipes(*) is a to-one embed: PostgREST returns it as an object (or
     // an array for to-many embeds) — normalize both shapes.
     return rows.map(r => {
@@ -352,12 +361,13 @@ async function fetchSavedRecipes() {
 async function fetchMyRecipes() {
     const user = await getCurrentUser();
     if (!user) return [];
-    const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/recipes?created_by=eq.${user.id}&order=created_at.desc&select=*`,
-        { headers: getAuthHeaders() }
-    );
-    if (!response.ok) throw new Error(`Supabase error: ${response.status}`);
-    return await response.json();
+    const { data, error } = await supabaseClient
+        .from('recipes')
+        .select('*')
+        .eq('created_by', user.id)
+        .order('created_at', { ascending: false });
+    if (error) throw new Error(`Supabase error: ${error.message}`);
+    return data || [];
 }
 
 function slugify(title) {
@@ -374,60 +384,45 @@ async function createRecipe(payload) {
         return null;
     }
     const id = `${slugify(payload.title)}-${Date.now().toString(36).slice(-4)}-${Math.random().toString(36).slice(2, 6)}`;
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes`, {
-        method: 'POST',
-        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-        body: JSON.stringify({ ...payload, id, created_by: user.id })
-    });
-    if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.message || 'Failed to create recipe');
-    }
-    const data = await response.json();
-    return Array.isArray(data) ? data[0] : data;
+    const { data, error } = await supabaseClient
+        .from('recipes')
+        .insert({ ...payload, id, created_by: user.id })
+        .select()
+        .single();
+    if (error) throw new Error(error.message || 'Failed to create recipe');
+    return data;
 }
 
 async function updateRecipe(id, payload) {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes?id=eq.${encodeURIComponent(id)}`, {
-        method: 'PATCH',
-        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-        body: JSON.stringify(payload)
-    });
-    if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.message || 'Failed to update recipe');
-    }
-    const data = await response.json();
-    return Array.isArray(data) ? data[0] : data;
+    const { data, error } = await supabaseClient
+        .from('recipes')
+        .update(payload)
+        .eq('id', id)
+        .select()
+        .single();
+    if (error) throw new Error(error.message || 'Failed to update recipe');
+    return data;
 }
 
 async function deleteRecipe(id) {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes?id=eq.${encodeURIComponent(id)}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-    });
-    if (!response.ok) throw new Error('Failed to delete recipe');
+    const { error } = await supabaseClient
+        .from('recipes')
+        .delete()
+        .eq('id', id);
+    if (error) throw new Error('Failed to delete recipe');
     return true;
 }
 
 async function uploadRecipeImage(file) {
-    const user = await getCurrentUser();
-    if (!user) throw new Error('Not logged in');
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) throw new Error('Not logged in');
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
     const path = `${user.id}/${Date.now()}-${safeName}`;
-    const response = await fetch(`${SUPABASE_URL}/storage/v1/object/recipe-images/${path}`, {
-        method: 'POST',
-        headers: {
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${getAccessToken()}`,
-            'Content-Type': file.type || 'application/octet-stream'
-        },
-        body: file
-    });
-    if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.message || 'Failed to upload image');
-    }
+    // No x-upsert header — a plain POST keeps storage RLS on the happy path.
+    const { error } = await supabaseClient.storage
+        .from('recipe-images')
+        .upload(path, file, { contentType: file.type || 'application/octet-stream' });
+    if (error) throw new Error(error.message || 'Failed to upload image');
     return `${SUPABASE_URL}/storage/v1/object/public/recipe-images/${path}`;
 }
 

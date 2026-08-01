@@ -27,7 +27,7 @@
         }
         .form-card > p {
             color: var(--color-text-light);
-            margin-bottom: 2rem;
+            margin-bottom: 1.75rem;
         }
         .field-group {
             margin-bottom: 1.25rem;
@@ -38,6 +38,11 @@
             margin-bottom: 0.375rem;
             font-size: 0.9rem;
             color: var(--color-text);
+        }
+        .field-hint {
+            color: var(--color-text-light);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
         }
         .field-group input[type="text"],
         .field-group input[type="email"],
@@ -212,15 +217,162 @@
             font-size: 0.9rem;
             display: none;
         }
-        .submit-row {
+
+        /* ========================================
+           Wizard / stepper
+           ======================================== */
+        .step-count {
+            text-align: center;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin: 0 0 1.25rem;
+            font-size: 0.9rem;
+        }
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.25rem;
+            max-width: 600px;
+            flex-wrap: wrap;
+            row-gap: 0.5rem;
+        }
+        .step-dot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .step-num {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            background: var(--color-bg);
+            border: 2px solid var(--color-border);
+            color: var(--color-text-light);
+            transition: all 0.2s;
+        }
+        .step-dot.active .step-num {
+            background: var(--color-primary);
+            border-color: var(--color-primary);
+            color: var(--color-white);
+            box-shadow: var(--shadow-sm);
+        }
+        .step-dot.done .step-num {
+            background: #F3E8D6;
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+        .step-label {
+            font-size: 0.7rem;
+            color: var(--color-text-light);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .step-dot.active .step-label {
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+        .step-connector {
+            align-self: flex-start;
+            margin-top: 16px; /* centers on the 34px circle */
+            width: 24px;
+            height: 2px;
+            background: var(--color-border);
+        }
+        .step-connector.done {
+            background: var(--color-primary);
+        }
+        @media (max-width: 640px) {
+            .step-label { display: none; }
+            .step-connector { width: 10px; }
+        }
+
+        .wizard-nav {
             margin-top: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
             flex-wrap: wrap;
         }
+        .wizard-nav .spacer {
+            flex: 1;
+        }
+
+        /* Review step */
+        .review-section {
+            margin-bottom: 1.5rem;
+        }
+        .review-section h3 {
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-text);
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 0.35rem;
+        }
+        .review-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem 1.5rem;
+        }
+        .review-item .label {
+            color: var(--color-text-light);
+            font-size: 0.8rem;
+        }
+        .review-item .value {
+            font-weight: 600;
+            color: var(--color-text);
+        }
+        .review-badge {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: var(--color-bg-alt);
+            color: var(--color-primary);
+        }
+        .review-list {
+            list-style: none;
+            margin: 0;
+        }
+        .review-list li {
+            padding: 0.3rem 0;
+            color: var(--color-text);
+            border-bottom: 1px dashed var(--color-border);
+        }
+        .review-list li:last-child {
+            border-bottom: none;
+        }
+        .review-list .step-index {
+            color: var(--color-primary);
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        .review-timer {
+            color: var(--color-text-light);
+            font-size: 0.85rem;
+            margin-left: 0.5rem;
+        }
+        .review-photo {
+            width: 180px;
+            max-height: 130px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--color-border);
+        }
+
         @media (max-width: 640px) {
             .form-row, .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+            .review-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -246,97 +398,155 @@
     <div class="form-page">
         <div class="form-card">
             <h1 id="formTitle">Create Recipe</h1>
-            <p id="formSubtitle">Share your bake with the community — or keep it private.</p>
+            <p id="formSubtitle">Share your bake with the community — or keep it private. We'll walk you through it step by step.</p>
 
             <div class="form-error" id="formError"></div>
             <div class="form-success" id="formSuccess"></div>
 
+            <!-- Progress indicator -->
+            <div class="stepper" id="stepper" aria-label="Recipe steps">
+                <div class="step-dot active" data-step="1">
+                    <span class="step-num">1</span>
+                    <span class="step-label">Basics</span>
+                </div>
+                <div class="step-connector" data-between="1"></div>
+                <div class="step-dot" data-step="2">
+                    <span class="step-num">2</span>
+                    <span class="step-label">Details</span>
+                </div>
+                <div class="step-connector" data-between="2"></div>
+                <div class="step-dot" data-step="3">
+                    <span class="step-num">3</span>
+                    <span class="step-label">Photo</span>
+                </div>
+                <div class="step-connector" data-between="3"></div>
+                <div class="step-dot" data-step="4">
+                    <span class="step-num">4</span>
+                    <span class="step-label">Ingredients</span>
+                </div>
+                <div class="step-connector" data-between="4"></div>
+                <div class="step-dot" data-step="5">
+                    <span class="step-num">5</span>
+                    <span class="step-label">Steps</span>
+                </div>
+                <div class="step-connector" data-between="5"></div>
+                <div class="step-dot" data-step="6">
+                    <span class="step-num">6</span>
+                    <span class="step-label">Review</span>
+                </div>
+            </div>
+            <p class="step-count" id="stepCount">Step 1 of 6</p>
+
             <form id="recipeForm" onsubmit="handleSubmit(event)">
-                <div class="field-group">
-                    <label for="title">Recipe Title *</label>
-                    <input type="text" id="title" required placeholder="e.g. Blueberry Muffins">
-                </div>
 
-                <div class="form-row">
+                <!-- Step 1 - Basics -->
+                <div class="wizard-step" id="step1">
                     <div class="field-group">
-                        <label for="category">Category</label>
-                        <select id="category">
-                            <option value="cookies">Cookies</option>
-                            <option value="cakes">Cakes</option>
-                            <option value="bread">Bread</option>
-                            <option value="other">Other</option>
-                        </select>
+                        <label for="title">Recipe Title *</label>
+                        <input type="text" id="title" placeholder="e.g. Blueberry Muffins" autocomplete="off">
+                        <p class="field-hint">What are we baking today?</p>
                     </div>
-                    <div class="field-group">
-                        <label for="difficulty">Difficulty</label>
-                        <select id="difficulty">
-                            <option value="Easy">Easy</option>
-                            <option value="Intermediate">Intermediate</option>
-                            <option value="Advanced">Advanced</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row-3">
-                    <div class="field-group">
-                        <label for="prepTime">Prep Time (min)</label>
-                        <input type="number" id="prepTime" min="0" value="15">
-                    </div>
-                    <div class="field-group">
-                        <label for="cookTime">Cook Time (min)</label>
-                        <input type="number" id="cookTime" min="0" value="30">
-                    </div>
-                    <div class="field-group">
-                        <label for="servings">Servings</label>
-                        <input type="number" id="servings" min="1" value="8">
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <label>Visibility</label>
-                    <div class="visibility-toggle">
-                        <div class="visibility-option selected" id="visPublic" onclick="selectVisibility('public')">
-                            <strong>🌍 Public</strong>
-                            <small>Visible to everyone on the homepage</small>
+                    <div class="form-row">
+                        <div class="field-group">
+                            <label for="category">Category</label>
+                            <select id="category">
+                                <option value="cookies">Cookies</option>
+                                <option value="cakes">Cakes</option>
+                                <option value="bread">Bread</option>
+                                <option value="other">Other</option>
+                            </select>
                         </div>
-                        <div class="visibility-option" id="visPrivate" onclick="selectVisibility('private')">
-                            <strong>🔒 Private</strong>
-                            <small>Only you can see it</small>
+                        <div class="field-group">
+                            <label for="difficulty">Difficulty</label>
+                            <select id="difficulty">
+                                <option value="Easy">Easy</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
+                            </select>
                         </div>
                     </div>
                 </div>
 
-                <div class="field-group">
-                    <label>Photo</label>
-                    <div class="image-picker">
-                        <img id="imagePreview" class="image-preview" alt="Recipe photo">
-                        <div>
-                            <input type="file" id="imageFile" accept="image/*" style="display:none;">
-                            <button type="button" class="file-input-btn" onclick="document.getElementById('imageFile').click()">Upload Photo</button>
-                            <div class="image-status" id="imageStatus">No photo uploaded (a placeholder will be used).</div>
+                <!-- Step 2 - Details -->
+                <div class="wizard-step" id="step2" style="display:none;">
+                    <div class="form-row-3">
+                        <div class="field-group">
+                            <label for="prepTime">Prep Time (min)</label>
+                            <input type="number" id="prepTime" min="0" value="15">
+                        </div>
+                        <div class="field-group">
+                            <label for="cookTime">Cook Time (min)</label>
+                            <input type="number" id="cookTime" min="0" value="30">
+                        </div>
+                        <div class="field-group">
+                            <label for="servings">Servings</label>
+                            <input type="number" id="servings" min="1" value="8">
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label>Visibility</label>
+                        <div class="visibility-toggle">
+                            <div class="visibility-option selected" id="visPublic" onclick="selectVisibility('public')">
+                                <strong>🌍 Public</strong>
+                                <small>Visible to everyone on the homepage</small>
+                            </div>
+                            <div class="visibility-option" id="visPrivate" onclick="selectVisibility('private')">
+                                <strong>🔒 Private</strong>
+                                <small>Only you can see it</small>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="field-group">
-                    <label for="description">Description</label>
-                    <textarea id="description" rows="3" placeholder="A short, appetizing summary..."></textarea>
+                <!-- Step 3 - Photo & Description -->
+                <div class="wizard-step" id="step3" style="display:none;">
+                    <div class="field-group">
+                        <label>Photo</label>
+                        <div class="image-picker">
+                            <img id="imagePreview" class="image-preview" alt="Recipe photo">
+                            <div>
+                                <input type="file" id="imageFile" accept="image/*" style="display:none;">
+                                <button type="button" class="file-input-btn" onclick="document.getElementById('imageFile').click()">Upload Photo</button>
+                                <div class="image-status" id="imageStatus">No photo uploaded (a placeholder will be used).</div>
+                            </div>
+                        </div>
+                        <p class="field-hint">Optional — a nice photo makes your recipe pop on the homepage.</p>
+                    </div>
+                    <div class="field-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" rows="3" placeholder="A short, appetizing summary..."></textarea>
+                    </div>
                 </div>
 
-                <div class="field-group">
-                    <label>Ingredients</label>
-                    <div class="dynamic-list" id="ingredientsList"></div>
-                    <button type="button" class="add-row-btn" onclick="addIngredientRow()">+ Add Ingredient</button>
+                <!-- Step 4 - Ingredients -->
+                <div class="wizard-step" id="step4" style="display:none;">
+                    <div class="field-group">
+                        <label>Ingredients</label>
+                        <div class="dynamic-list" id="ingredientsList"></div>
+                        <button type="button" class="add-row-btn" onclick="addIngredientRow()">+ Add Ingredient</button>
+                    </div>
                 </div>
 
-                <div class="field-group">
-                    <label>Steps</label>
-                    <div class="dynamic-list" id="stepsList"></div>
-                    <button type="button" class="add-row-btn" onclick="addStepRow()">+ Add Step</button>
+                <!-- Step 5 - Steps -->
+                <div class="wizard-step" id="step5" style="display:none;">
+                    <div class="field-group">
+                        <label>Steps</label>
+                        <div class="dynamic-list" id="stepsList"></div>
+                        <button type="button" class="add-row-btn" onclick="addStepRow()">+ Add Step</button>
+                        <p class="field-hint">Optional timer: add minutes to any step to show a built-in bake timer (like on the recipe pages).</p>
+                    </div>
                 </div>
 
-                <div class="submit-row">
-                    <button type="submit" class="btn btn-primary" id="submitBtn">Create Recipe</button>
+                <!-- Step 6 - Review & Create -->
+                <div class="wizard-step" id="step6" style="display:none;">
+                    <div id="reviewSummary"></div>
+                </div>
+
+                <div class="wizard-nav">
+                    <button type="button" class="btn btn-secondary" id="backBtn" onclick="goToStep(currentStep - 1)" style="display:none;">&larr; Back</button>
+                    <span class="spacer"></span>
+                    <button type="button" class="btn btn-primary" id="nextBtn" onclick="handleNext()">Next &rarr;</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn" style="display:none;">Create Recipe</button>
                     <a href="my-recipes.html" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
@@ -349,22 +559,111 @@
         </div>
     </footer>
 
+    <script src="supabase.js"></script>
     <script src="auth.js"></script>
     <script src="script.js"></script>
     <script>
         const PLACEHOLDER_IMAGE = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Crect width='100%25' height='100%25' fill='%23E8DDD0'/%3E%3Ctext x='50%25' y='50%25' font-family='sans-serif' font-size='28' fill='%236B5B50' text-anchor='middle'%3ENo photo%3C/text%3E%3C/svg%3E";
 
+        const TOTAL_STEPS = 6;
+        let currentStep = 1;
         let editId = null;
         let imageUrl = null;
         let visibility = 'public';
         let currentUser = null;
 
+        // ========================================
+        // Wizard navigation
+        // ========================================
+        function showStep(n) {
+            currentStep = n;
+            for (let i = 1; i <= TOTAL_STEPS; i++) {
+                document.getElementById('step' + i).style.display = (i === n) ? '' : 'none';
+            }
+            // Stepper dots + connectors
+            document.querySelectorAll('.step-dot').forEach(dot => {
+                const s = parseInt(dot.dataset.step, 10);
+                dot.classList.toggle('active', s === n);
+                dot.classList.toggle('done', s < n);
+            });
+            document.querySelectorAll('.step-connector').forEach(conn => {
+                conn.classList.toggle('done', n > parseInt(conn.dataset.between, 10));
+            });
+            document.getElementById('stepCount').textContent = `Step ${n} of ${TOTAL_STEPS}`;
+
+            const backBtn = document.getElementById('backBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            backBtn.style.display = n > 1 ? '' : 'none';
+            if (n === TOTAL_STEPS) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = '';
+                renderReview();
+            } else {
+                nextBtn.style.display = '';
+                submitBtn.style.display = 'none';
+                nextBtn.textContent = (n === TOTAL_STEPS - 1) ? 'Review & Create →' : 'Next →';
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToStep(n) {
+            if (n < 1 || n > TOTAL_STEPS) return;
+            hideFormError();
+            showStep(n);
+        }
+
+        function handleNext() {
+            hideFormError();
+            if (!validateStep(currentStep)) return;
+            showStep(currentStep + 1);
+        }
+
+        // Per-step validation — don't let them advance without the essentials.
+        function validateStep(n) {
+            if (n === 1) {
+                if (!document.getElementById('title').value.trim()) {
+                    showFormError('Please add a recipe title before continuing.');
+                    return false;
+                }
+            } else if (n === 2) {
+                const prep = parseInt(document.getElementById('prepTime').value, 10) || 0;
+                const cook = parseInt(document.getElementById('cookTime').value, 10) || 0;
+                const servings = parseInt(document.getElementById('servings').value, 10) || 0;
+                if (prep < 0 || cook < 0) {
+                    showFormError('Times can\'t be negative.');
+                    return false;
+                }
+                if (servings < 1) {
+                    showFormError('Servings must be at least 1.');
+                    return false;
+                }
+            } else if (n === 4) {
+                if (!getIngredients().length) {
+                    showFormError('Add at least one ingredient.');
+                    return false;
+                }
+            } else if (n === 5) {
+                if (!getSteps().length) {
+                    showFormError('Add at least one step.');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // ========================================
+        // Visibility
+        // ========================================
         function selectVisibility(v) {
             visibility = v;
             document.getElementById('visPublic').classList.toggle('selected', v === 'public');
             document.getElementById('visPrivate').classList.toggle('selected', v === 'private');
         }
 
+        // ========================================
+        // Dynamic rows (ingredients + steps)
+        // ========================================
         function addIngredientRow(amount = '', name = '') {
             const div = document.createElement('div');
             div.className = 'dynamic-row';
@@ -382,7 +681,7 @@
                 <textarea class="step-text" rows="2" placeholder="Step description">${escapeHtml(text)}</textarea>
                 <div class="step-timer">
                     <input type="number" class="step-minutes" min="0" placeholder="Timer min (optional)" value="${escapeAttr(minutes)}">
-                    <input type="text" class="step-label" placeholder="Timer label (optional)" value="${escapeAttr(label)}">
+                    <input type="text" class="step-label-input" placeholder="Timer label (optional)" value="${escapeAttr(label)}">
                 </div>
                 <button type="button" class="row-remove" onclick="removeRow(this)" title="Remove">✕</button>`;
             document.getElementById('stepsList').appendChild(div);
@@ -392,6 +691,30 @@
             btn.closest('.dynamic-row').remove();
         }
 
+        function getIngredients() {
+            return [...document.querySelectorAll('#ingredientsList .dynamic-row')]
+                .map(r => ({
+                    amount: r.querySelector('.ing-amount').value.trim(),
+                    name: r.querySelector('.ing-name').value.trim()
+                }))
+                .filter(i => i.amount || i.name);
+        }
+
+        function getSteps() {
+            return [...document.querySelectorAll('#stepsList .dynamic-row')]
+                .map(r => {
+                    const text = r.querySelector('.step-text').value.trim();
+                    const minutes = parseInt(r.querySelector('.step-minutes').value, 10);
+                    const label = r.querySelector('.step-label-input').value.trim();
+                    return {
+                        text,
+                        timerMinutes: minutes > 0 ? minutes : null,
+                        timerLabel: minutes > 0 ? (label || null) : null
+                    };
+                })
+                .filter(s => s.text);
+        }
+
         function escapeHtml(str) {
             return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
@@ -399,6 +722,9 @@
             return escapeHtml(str).replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
 
+        // ========================================
+        // Photo upload
+        // ========================================
         async function handleImageUpload(file) {
             const status = document.getElementById('imageStatus');
             const preview = document.getElementById('imagePreview');
@@ -419,6 +745,73 @@
             }
         }
 
+        // ========================================
+        // Review summary
+        // ========================================
+        function renderReview() {
+            const title = document.getElementById('title').value.trim() || '(untitled)';
+            const category = document.getElementById('category').value;
+            const difficulty = document.getElementById('difficulty').value;
+            const prep = parseInt(document.getElementById('prepTime').value, 10) || 0;
+            const cook = parseInt(document.getElementById('cookTime').value, 10) || 0;
+            const servings = parseInt(document.getElementById('servings').value, 10) || 1;
+            const description = document.getElementById('description').value.trim();
+            const ingredients = getIngredients();
+            const steps = getSteps();
+
+            const photoHtml = (imageUrl && !imageUrl.startsWith('data:'))
+                ? `<img class="review-photo" src="${escapeAttr(imageUrl)}" alt="Recipe photo">`
+                : `<span class="value">No photo (a placeholder will be used)</span>`;
+
+            const ingredientsHtml = ingredients.length
+                ? ingredients.map(i => `<li><span class="step-index">•</span>${escapeHtml(i.amount)} ${escapeHtml(i.name)}</li>`).join('')
+                : '<li>None added</li>';
+
+            const stepsHtml = steps.length
+                ? steps.map((s, i) => `
+                    <li>
+                        <span class="step-index">${i + 1}</span>${escapeHtml(s.text)}
+                        ${s.timerMinutes ? `<span class="review-timer">⏱️ ${s.timerMinutes} min${s.timerLabel ? ' — ' + escapeHtml(s.timerLabel) : ''}</span>` : ''}
+                    </li>`).join('')
+                : '<li>None added</li>';
+
+            document.getElementById('reviewSummary').innerHTML = `
+                <div class="review-section">
+                    <h3>Basics</h3>
+                    <div class="review-grid">
+                        <div class="review-item"><div class="label">Title</div><div class="value">${escapeHtml(title)}</div></div>
+                        <div class="review-item"><div class="label">Category</div><div class="value">${escapeHtml(category)}</div></div>
+                        <div class="review-item"><div class="label">Difficulty</div><div class="value">${escapeHtml(difficulty)}</div></div>
+                        <div class="review-item"><div class="label">Visibility</div><div class="value"><span class="review-badge">${visibility === 'public' ? '🌍 Public' : '🔒 Private'}</span></div></div>
+                    </div>
+                </div>
+                <div class="review-section">
+                    <h3>Details</h3>
+                    <div class="review-grid">
+                        <div class="review-item"><div class="label">Prep Time</div><div class="value">${prep} min</div></div>
+                        <div class="review-item"><div class="label">Cook Time</div><div class="value">${cook} min</div></div>
+                        <div class="review-item"><div class="label">Servings</div><div class="value">${servings}</div></div>
+                    </div>
+                </div>
+                <div class="review-section">
+                    <h3>Photo &amp; Description</h3>
+                    <div class="review-item" style="margin-bottom:0.6rem;">${photoHtml}</div>
+                    <div class="review-item"><div class="label">Description</div><div class="value">${escapeHtml(description) || '<span class="review-timer">(none)</span>'}</div></div>
+                </div>
+                <div class="review-section">
+                    <h3>Ingredients (${ingredients.length})</h3>
+                    <ul class="review-list">${ingredientsHtml}</ul>
+                </div>
+                <div class="review-section">
+                    <h3>Steps (${steps.length})</h3>
+                    <ul class="review-list">${stepsHtml}</ul>
+                </div>
+            `;
+        }
+
+        // ========================================
+        // Edit mode
+        // ========================================
         async function loadEditMode(id) {
             const recipe = await fetchRecipeById(id);
             if (!recipe) {
@@ -456,41 +849,28 @@
             if (!recipe.steps || !recipe.steps.length) addStepRow();
         }
 
+        // ========================================
+        // Form helpers
+        // ========================================
         function showFormError(msg) {
             const el = document.getElementById('formError');
             el.textContent = msg;
             el.style.display = 'block';
         }
 
+        function hideFormError() {
+            document.getElementById('formError').style.display = 'none';
+        }
+
         async function handleSubmit(e) {
             e.preventDefault();
-            const errorEl = document.getElementById('formError');
-            errorEl.style.display = 'none';
-            const btn = document.getElementById('submitBtn');
+            hideFormError();
 
             const title = document.getElementById('title').value.trim();
+            const ingredients = getIngredients();
+            const steps = getSteps();
             if (!title) { showFormError('Please add a title.'); return; }
-
-            const ingredients = [...document.querySelectorAll('#ingredientsList .dynamic-row')]
-                .map(r => ({
-                    amount: r.querySelector('.ing-amount').value.trim(),
-                    name: r.querySelector('.ing-name').value.trim()
-                }))
-                .filter(i => i.amount || i.name);
             if (!ingredients.length) { showFormError('Add at least one ingredient.'); return; }
-
-            const steps = [...document.querySelectorAll('#stepsList .dynamic-row')]
-                .map(r => {
-                    const text = r.querySelector('.step-text').value.trim();
-                    const minutes = parseInt(r.querySelector('.step-minutes').value, 10);
-                    const label = r.querySelector('.step-label').value.trim();
-                    return {
-                        text,
-                        timerMinutes: minutes > 0 ? minutes : null,
-                        timerLabel: minutes > 0 ? (label || null) : null
-                    };
-                })
-                .filter(s => s.text);
             if (!steps.length) { showFormError('Add at least one step.'); return; }
 
             const payload = {
@@ -507,6 +887,7 @@
                 steps
             };
 
+            const btn = document.getElementById('submitBtn');
             btn.disabled = true;
             btn.textContent = editId ? 'Saving...' : 'Creating...';
             try {
@@ -519,12 +900,18 @@
                 }
             } catch (err) {
                 console.error(err);
+                // Only a genuinely invalid session sends the user to login;
+                // everything else shows a friendly message and lets them retry.
+                if (await redirectIfSignedOut()) return;
                 showFormError(err.message || 'Failed to save recipe.');
                 btn.disabled = false;
                 btn.textContent = editId ? 'Save Changes' : 'Create Recipe';
             }
         }
 
+        // ========================================
+        // Init
+        // ========================================
         (async () => {
             currentUser = await checkSession();
             if (!currentUser) { window.location.href = 'login.html'; return; }
@@ -532,10 +919,6 @@
             document.getElementById('imageFile').addEventListener('change', e => {
                 handleImageUpload(e.target.files[0]);
             });
-
-            // seed one empty ingredient + step row for easy starts
-            addIngredientRow();
-            addStepRow();
 
             const params = new URLSearchParams(window.location.search);
             const editIdParam = params.get('id');
@@ -547,6 +930,12 @@
                     showFormError('Could not load recipe for editing.');
                 }
             }
+
+            // Seed one empty ingredient + step row for easy starts (skip in edit mode when data exists)
+            if (!getIngredients().length) addIngredientRow();
+            if (!getSteps().length) addStepRow();
+
+            showStep(1);
         })();
     </script>
 </body>
