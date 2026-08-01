@@ -86,17 +86,19 @@ h2 {
 
 .header-content {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 1rem 0;
+    gap: 24px;               /* 8pt grid */
+    padding: 16px 0;         /* 8pt grid */
 }
 
 .logo {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px;
     text-decoration: none;
     color: var(--color-text);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .logo-icon {
@@ -109,21 +111,224 @@ h2 {
     font-weight: 700;
 }
 
+/* Primary nav links (desktop: one inline row) */
 .nav {
     display: flex;
-    gap: 2rem;
+    align-items: center;
+    gap: 4px;                /* tightest gap — per-item padding adds the rest */
+    flex-wrap: nowrap;
 }
 
 .nav-link {
+    display: inline-flex;
+    align-items: center;
     text-decoration: none;
     color: var(--color-text-light);
     font-weight: 500;
-    transition: color 0.2s;
+    padding: 8px 12px;
+    border-radius: 50px;
+    white-space: nowrap;
+    transition: color 0.2s ease, background 0.2s ease;
 }
 
-.nav-link:hover,
+/* Subtle frosted-glass hover highlight. Tinted warm (rgba of the text
+   color) so it reads on the white/cream header — pure white would be
+   invisible here. */
+.nav-link:hover {
+    color: var(--color-text);
+    background: rgba(61, 43, 31, 0.06);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+
 .nav-link.active {
     color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* Right-hand actions: "+ Create" + user menu / Sign In */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;       /* push to the right of the header */
+}
+
+/* "+ Create" — compact version of the primary accent button */
+.nav-actions .nav-create {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: 50px;
+    white-space: nowrap;
+}
+
+.nav-actions .nav-create:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* User menu (avatar + name + sign out) */
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    border-radius: 50px;
+    white-space: nowrap;
+    transition: background 0.2s ease;
+}
+
+.user-menu:hover {
+    background: rgba(61, 43, 31, 0.06);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.user-avatar-fallback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary);
+    color: var(--color-white);
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.user-name {
+    font-weight: 500;
+    color: var(--color-text);
+    font-size: 0.9rem;
+}
+
+.user-signout {
+    padding: 6px 12px;
+    border: 1px solid var(--color-border);
+    background: var(--color-white);
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: var(--font-body);
+    color: var(--color-text-light);
+    transition: all 0.2s;
+}
+
+.user-signout:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+/* Mobile-only "Sign out" row inside the collapsed menu */
+.nav-logout {
+    display: none;
+}
+
+/* Hamburger toggle (hidden on desktop) */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    margin-left: 4px;
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.nav-toggle:hover {
+    background: rgba(61, 43, 31, 0.06);
+}
+
+.nav-toggle-bar {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--color-text);
+    border-radius: 2px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) {
+    opacity: 0;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+}
+
+/* ========================================
+   Collapsed nav (hamburger) below 1080px
+   ======================================== */
+@media (max-width: 1080px) {
+    .nav-toggle {
+        display: flex;
+    }
+
+    .nav {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+        padding: 8px 16px 16px;
+        background: var(--color-white);
+        border-top: 1px solid var(--color-border);
+        box-shadow: var(--shadow-md);
+        display: none;
+        max-height: calc(100vh - 72px);
+        overflow-y: auto;
+    }
+
+    .nav.open {
+        display: flex;
+    }
+
+    .nav .nav-link {
+        padding: 12px 16px;
+        border-radius: var(--radius-sm);
+    }
+
+    /* On small screens the header bar keeps "+ Create" + the avatar only;
+       "Sign out" lives at the bottom of the collapsed menu. */
+    .nav-logout {
+        display: flex;
+        margin-top: 4px;
+        color: var(--color-text-light);
+    }
+
+    .nav-actions {
+        gap: 8px;
+    }
+
+    .user-name {
+        display: none;
+    }
+
+    .user-signout {
+        display: none;
+    }
+
+    .user-menu {
+        padding: 4px;
+    }
 }
 
 /* ========================================
@@ -774,15 +979,6 @@ h2 {
 }
 
 @media (max-width: 600px) {
-    .header-content {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .nav {
-        gap: 1rem;
-    }
-
     .hero {
         padding: 3rem 0;
     }

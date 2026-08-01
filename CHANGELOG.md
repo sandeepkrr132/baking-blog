@@ -34,6 +34,22 @@ Includes a stepper progress bar ("Step 3 of 6"), Back/Next with **per-step valid
 
 ---
 
+## [2026-08-01] Nav cleanup
+
+The top nav was cramped — links ran together ("Saved My Recipes" read as one phrase), "+ Create" was plain text, and at small widths the header stacked vertically instead of collapsing.
+
+- **`styles.css`** — rebuilt the header/nav on an **8pt grid**:
+  - Every `.nav-link` has its own pill padding (`8px 12px`) with `4px` gaps, so items read as distinct targets.
+  - Subtle **glassmorphic hover**: `background: rgba(61,43,31,0.06)` + `backdrop-filter: blur(6px)`, rounded pill. Tinted warm (not pure white) so it's actually visible on the white/cream header.
+  - **"+ Create"** is now a compact primary accent button (`.btn .btn-primary .nav-create`, pill radius, `8px 16px`) matching the homepage "Browse Recipes" style; it stays top-right on every page.
+  - User menu (avatar/name/sign out) and the Sign In button restyled to match.
+  - **Mobile ≤1080px**: nav collapses into a hamburger. The bar keeps the logo, "+ Create" and the avatar; Home/Recipes/About/Saved/My Recipes + a "Sign out" row live in the dropdown. Toggle animates to an ✕; menu closes on link tap, outside tap, or Escape.
+- **`script.js`** — `renderAuthNav()` now splits the signed-in nav into `#authNav` (Saved / My Recipes, inside the hamburger) and `#authActions` ("+ Create" + avatar, always visible). Added `setupNavToggle()` for the hamburger (with `aria-expanded`).
+- **Pages** — `index.html`, `recipe.html`, `my-recipes.html`, `saved.html`, `create-recipe.html` headers got `id="siteNav"`, a `#authActions` slot, and the `#navToggle` button; 4 static recipe pages regenerated.
+- Breakpoint: full inline nav at ≥1081px; hamburger below. Verified headless (Playwright): desktop spacing/actions + mobile toggle/close behavior all pass.
+
+---
+
 ## [2026-07-31] Saved Recipes + User-Created Recipes
 
 Signed-in users can now **save/favorite recipes** and **create, edit, and delete their own recipes**, with per-recipe **public/private** visibility and **image upload** to Supabase Storage. This is the groundwork for a future paid/selling layer — the ownership + visibility model is structured so a `price` field can be added without restructuring.

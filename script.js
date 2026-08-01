@@ -758,8 +758,9 @@ function toggleStepComplete(stepId) {
 // Initialize on DOM Load
 // ========================================
 document.addEventListener('DOMContentLoaded', async () => {
-    // Render auth nav
+    // Render auth nav + wire the mobile hamburger
     renderAuthNav();
+    setupNavToggle();
 
     // Check if we're on the homepage or recipe page
     if (document.getElementById('recipeGrid')) {
@@ -772,9 +773,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ========================================
 // Auth Nav Rendering
 // ========================================
+// Splits the signed-in nav across two containers:
+//   #authNav      — "Saved" / "My Recipes" links (collapse into the hamburger)
+//   #authActions  — "+ Create" button + avatar/sign-out (always visible)
 async function renderAuthNav() {
     const navEl = document.getElementById('authNav');
+    const actionsEl = document.getElementById('authActions');
     if (!navEl) return;
+
+    const signInButton = `<a href="login.html" class="btn btn-primary nav-create">Sign In</a>`;
 
     try {
         const user = await checkSession();
@@ -782,25 +789,66 @@ async function renderAuthNav() {
             const meta = user.user_metadata || user.raw_user_meta_data || {};
             const name = meta.full_name || meta.name || user.email.split('@')[0];
             const avatar = meta.avatar_url || meta.picture || null;
+
             navEl.innerHTML = `
                 <a href="saved.html" class="nav-link">Saved</a>
                 <a href="my-recipes.html" class="nav-link">My Recipes</a>
-                <a href="create-recipe.html" class="nav-link">+ Create</a>
-                <div class="user-menu" style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;position:relative;">
-                    ${avatar
-                        ? `<img src="${avatar}" alt="${name}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">`
-                        : `<span style="width:32px;height:32px;border-radius:50%;background:var(--color-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.875rem;">${name.charAt(0).toUpperCase()}</span>`
-                    }
-                    <span style="font-weight:500;color:var(--color-text);font-size:0.9rem;">${name}</span>
-                    <button onclick="signOut()" style="margin-left:0.5rem;padding:0.375rem 0.75rem;border:1px solid var(--color-border);background:white;border-radius:var(--radius-sm);cursor:pointer;font-size:0.8rem;color:var(--color-text-light);">Sign out</button>
-                </div>
-            `;
-        } else {
-            navEl.innerHTML = `<a href="login.html" class="nav-link" style="padding:0.5rem 1rem;border:2px solid var(--color-primary);border-radius:var(--radius-sm);color:var(--color-primary);font-weight:600;">Sign In</a>`;
+                <a href="login.html" class="nav-link nav-logout" onclick="signOut(); return false;">Sign out</a>`;
+
+            if (actionsEl) {
+                actionsEl.innerHTML = `
+                    <a href="create-recipe.html" class="btn btn-primary nav-create">+ Create</a>
+                    <div class="user-menu">
+                        ${avatar
+                            ? `<img src="${avatar}" alt="${name}" class="user-avatar">`
+                            : `<span class="user-avatar user-avatar-fallback">${name.charAt(0).toUpperCase()}</span>`
+                        }
+                        <span class="user-name">${name}</span>
+                        <button class="user-signout" onclick="signOut()">Sign out</button>
+                    </div>`;
+            }
+        } else if (actionsEl) {
+            actionsEl.innerHTML = signInButton;
+            navEl.innerHTML = '';
         }
     } catch (e) {
-        navEl.innerHTML = `<a href="login.html" class="nav-link" style="padding:0.5rem 1rem;border:2px solid var(--color-primary);border-radius:var(--radius-sm);color:var(--color-primary);font-weight:600;">Sign In</a>`;
+        if (actionsEl) actionsEl.innerHTML = signInButton;
+        navEl.innerHTML = '';
     }
+}
+
+// ========================================
+// Mobile nav hamburger toggle
+// ========================================
+function setupNavToggle() {
+    const toggle = document.getElementById('navToggle');
+    const nav = document.getElementById('siteNav');
+    if (!toggle || !nav) return;
+
+    const setOpen = (open) => {
+        nav.classList.toggle('open', open);
+        toggle.setAttribute('aria-expanded', String(open));
+    };
+
+    toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setOpen(!nav.classList.contains('open'));
+    });
+
+    // Close after tapping any link inside the menu
+    nav.addEventListener('click', (e) => {
+        if (e.target.closest('a')) setOpen(false);
+    });
+
+    // Close when tapping outside the header
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.header')) setOpen(false);
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') setOpen(false);
+    });
 }
 
 // Clean up intervals on page unload
