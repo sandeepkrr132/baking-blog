@@ -264,10 +264,20 @@ function updateTimerDisplay(timerId) {
 // access token and refreshes it automatically when expired (with a retry).
 async function fetchRecipes() {
     // Homepage shows only public recipes (private ones are owner-only)
-    const { data, error } = await supabaseClient
-        .from('recipes')
-        .select('*')
-        .eq('visibility', 'public');
+    // PostgREST caps a single request at 1000 rows (db-max-rows), so page through.
+    const PAGE = 1000;
+    let all = [];
+    for (let start = 0; ; start += PAGE) {
+        const { data, error } = await supabaseClient
+            .from('recipes')
+            .select('*')
+            .eq('visibility', 'public')
+            .range(start, start + PAGE - 1);
+        if (error) throw new Error(`Supabase error: ${error.message}`);
+        all = all.concat(data || []);
+        if ((data || []).length < PAGE) break;
+    }
+    return all;
     if (error) throw new Error(`Supabase error: ${error.message}`);
     return data || [];
 }
