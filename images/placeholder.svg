@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF8F0"/>
+      <stop offset="100%" stop-color="#FEF3E2"/>
+    </linearGradient>
+    <linearGradient id="case" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E8B48F"/>
+      <stop offset="100%" stop-color="#C45D3E"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="1000" fill="url(#bg)"/>
+
+  <!-- subtle decorative dots -->
+  <g fill="#E8A838" opacity="0.35">
+    <circle cx="120" cy="160" r="5"/><circle cx="680" cy="200" r="5"/>
+    <circle cx="150" cy="820" r="5"/><circle cx="640" cy="860" r="5"/>
+    <circle cx="400" cy="90" r="4"/><circle cx="260" cy="920" r="4"/>
+  </g>
+
+  <!-- cupcake -->
+  <g transform="translate(400 470)">
+    <!-- wrapper -->
+    <path d="M-95 0 L95 0 L78 150 Q0 175 -78 150 Z" fill="url(#case)"/>
+    <g stroke="#FFF8F0" stroke-width="10" opacity="0.85">
+      <line x1="-78" y1="30" x2="-64" y2="130"/>
+      <line x1="-40" y1="22" x2="-32" y2="128"/>
+      <line x1="0" y1="20" x2="0" y2="126"/>
+      <line x1="40" y1="22" x2="32" y2="128"/>
+      <line x1="78" y1="30" x2="64" y2="130"/>
+    </g>
+    <!-- swirl -->
+    <g fill="#FFF8F0">
+      <ellipse cx="-40" cy="-40" rx="60" ry="42"/>
+      <ellipse cx="35" cy="-55" rx="58" ry="40"/>
+      <ellipse cx="-5" cy="-75" rx="52" ry="36"/>
+    </g>
+    <path d="M0 -125 Q30 -95 0 -70 Q-30 -95 0 -125 Z" fill="#E8A838"/>
+    <circle cx="-55" cy="-35" r="9" fill="#E8A838"/>
+    <circle cx="60" cy="-30" r="9" fill="#E8A838"/>
+    <circle cx="10" cy="-10" r="9" fill="#8B9E7C"/>
+    <circle cx="-20" cy="10" r="7" fill="#C45D3E"/>
+    <circle cx="35" cy="5" r="7" fill="#E8A838"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="400" y="820" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif" font-size="64"
+        font-weight="700" fill="#3D2B1F" letter-spacing="1">Sweet Crumbs</text>
+  <text x="400" y="872" text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif" font-size="30"
+        fill="#8B9E7C" letter-spacing="4">BAKING RECIPE</text>
+</svg>

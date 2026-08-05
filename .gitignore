@@ -1,4 +1,40 @@
+# ---- Local secrets (never commit) ----
+.env
+
+# ---- Vercel / tooling ----
 .vercel
 node_modules/
 .playwright-mcp/
-.env
+
+# ---- Generated recipe pages (build-recipes.js regenerates them) ----
+/*.html
+!/index.html
+!/recipe.html
+!/login.html
+!/create-recipe.html
+!/my-recipes.html
+!/saved.html
+!/auth-callback.html
+!/admin.html
+
+# ---- Scraped/fetched images (fetch-images.py regenerates) ----
+images/*.jpg
+images/*.jpeg
+images/*.webp
+
+# ---- Transient checkpoints & reports ----
+*.jsonl
+vision-check-report.md
+image-fetch-results.json
+image-fetch-failures.json
+recipes.backup.json
+contact_sheets/
+
+# ---- Generated seed SQL (build-supabase-seed.js regenerates) ----
+supabase-seed.sql
+supabase-batch-*.sql
+sb-*.sql
+
+# ---- Python / build caches ----
+__pycache__/
+*.pyc
