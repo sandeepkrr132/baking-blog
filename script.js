@@ -440,6 +440,10 @@ async function uploadRecipeImage(file) {
 // Render Recipe Cards (Homepage)
 // ========================================
 function renderRecipeCards(recipesList, container) {
+    if (!recipesList || !recipesList.length) {
+        container.innerHTML = '<p class="no-results">No recipes found. Try a different search or category.</p>';
+        return;
+    }
     container.innerHTML = recipesList.map(recipe => {
         // User-created recipes have no static page; route them to the dynamic view
         const href = recipe.created_by
@@ -522,21 +526,42 @@ async function refreshMyRecipes() {
 // ========================================
 function setupCategoryFilter(container) {
     const filterButtons = document.querySelectorAll('.filter-btn');
+    const searchInput = document.getElementById('recipeSearch');
+    let activeCategory = 'all';
+
+    function ingredientText(r) {
+        // Match search terms against ingredient names (e.g. "chocolate chips")
+        const names = (r.ingredients || [])
+            .map(ing => (typeof ing === 'string' ? ing : ing.name))
+            .filter(Boolean)
+            .join(' ');
+        return (r.title || '') + ' ' + (r.description || '') + ' ' + names;
+    }
+
+    function applyFilters() {
+        const q = (searchInput ? searchInput.value : '').trim().toLowerCase();
+        let filtered = recipes;
+        if (activeCategory !== 'all') {
+            filtered = filtered.filter(r => r.category === activeCategory);
+        }
+        if (q) {
+            filtered = filtered.filter(r => ingredientText(r).toLowerCase().includes(q));
+        }
+        renderRecipeCards(filtered, container);
+    }
 
     filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Update active state
             filterButtons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
-            const category = btn.dataset.category;
-            const filtered = category === 'all'
-                ? recipes
-                : recipes.filter(r => r.category === category);
-
-            renderRecipeCards(filtered, container);
+            activeCategory = btn.dataset.category;
+            applyFilters();
         });
     });
+
+    if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+    }
 }
 
 // ========================================
