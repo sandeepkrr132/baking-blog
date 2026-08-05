@@ -27,7 +27,23 @@ OUT_JSONL = os.path.join(BASE, "ai-cleanup-suggestions.jsonl")
 OUT_JSON = os.path.join(BASE, "ai-suggestions.json")
 OUT_REPORT = os.path.join(BASE, "ai-cleanup-report.md")
 
-KEY = os.environ.get("KIMI_API_KEY")  # required — never hardcode; set via env
+def load_env():
+    """Load secrets from a local .env file (gitignored) into os.environ.
+    Never commit .env — keep API keys out of git history."""
+    env_path = os.path.join(BASE, ".env")
+    if not os.path.exists(env_path):
+        return
+    with open(env_path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, _, v = line.partition("=")
+            os.environ.setdefault(k.strip(), v.strip())
+
+load_env()
+
+KEY = os.environ.get("KIMI_API_KEY")  # required — set in .env or the environment
 KIMI_URL = "https://api.moonshot.ai/v1/chat/completions"
 KIMI_MODEL = os.environ.get("KIMI_MODEL", "moonshot-v1-32k-vision-preview")
 
