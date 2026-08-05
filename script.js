@@ -799,10 +799,12 @@ async function renderAuthNav() {
             const meta = user.user_metadata || user.raw_user_meta_data || {};
             const name = meta.full_name || meta.name || user.email.split('@')[0];
             const avatar = meta.avatar_url || meta.picture || null;
+            const admin = await isAdmin();
 
             navEl.innerHTML = `
                 <a href="saved.html" class="nav-link">Saved</a>
                 <a href="my-recipes.html" class="nav-link">My Recipes</a>
+                ${admin ? '<a href="admin.html" class="nav-link">Admin</a>' : ''}
                 <a href="login.html" class="nav-link nav-logout" onclick="signOut(); return false;">Sign out</a>`;
 
             if (actionsEl) {

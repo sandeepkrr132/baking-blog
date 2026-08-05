@@ -63,6 +63,24 @@ async function checkSession() {
     return await getCurrentUser();
 }
 
+// Whether the signed-in user is a site admin (profiles.is_admin).
+// Non-admin / signed-out users resolve to false.
+async function isAdmin() {
+    const user = await getCurrentUser();
+    if (!user) return false;
+    try {
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .maybeSingle();
+        if (error || !data) return false;
+        return !!data.is_admin;
+    } catch (e) {
+        return false;
+    }
+}
+
 // Google sign-in (client handles OAuth + PKCE + session storage).
 async function signInWithGoogleProvider() {
     const PROD_URL = 'https://baking-blog-three.vercel.app';

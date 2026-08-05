@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Sweet Crumbs</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .page-section {
+            padding: 3rem 1rem;
+        }
+        .page-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+        .page-title {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            color: var(--color-text);
+        }
+        .page-subtitle {
+            color: var(--color-text-light);
+            margin-bottom: 1.25rem;
+        }
+        .admin-toolbar {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .admin-toolbar input[type="search"] {
+            flex: 1;
+            min-width: 220px;
+            max-width: 420px;
+            padding: 0.65rem 1rem;
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-family: var(--font-body);
+        }
+        .admin-toolbar select {
+            padding: 0.65rem 1rem;
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-family: var(--font-body);
+            background: var(--color-bg);
+        }
+        .admin-count {
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+        }
+        .my-recipe-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .my-action-btn {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.85rem;
+        }
+        .my-action-delete {
+            background: #c62828;
+            border-color: #c62828;
+            color: #fff;
+        }
+        .my-action-delete:hover {
+            background: #b71c1c;
+        }
+        .my-action-edit {
+            background: #2c2823;
+            border-color: #2c2823;
+            color: #fff;
+        }
+        .my-action-edit:hover {
+            background: #1f1b17;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--color-text-light);
+        }
+        .recipe-card-description {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🧁</span>
+                    <span class="logo-text">Sweet Crumbs</span>
+                </a>
+                <nav class="nav" id="siteNav">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="index.html#recipes" class="nav-link">Recipes</a>
+                    <span id="authNav"></span>
+                </nav>
+                <div class="nav-actions" id="authActions"></div>
+                <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="siteNav">
+                    <span class="nav-toggle-bar"></span>
+                    <span class="nav-toggle-bar"></span>
+                    <span class="nav-toggle-bar"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="page-section">
+        <div class="container">
+            <div class="page-header-row">
+                <h1 class="page-title">Admin</h1>
+                <a href="create-recipe.html" class="btn btn-primary">+ Create Recipe</a>
+            </div>
+            <p class="page-subtitle">Edit any recipe — image, title, ingredients, and steps.</p>
+
+            <div class="admin-toolbar">
+                <input type="search" id="searchInput" placeholder="Search recipes by title or id..." aria-label="Search recipes">
+                <select id="categoryFilter" aria-label="Filter by category">
+                    <option value="all">All categories</option>
+                </select>
+                <span class="admin-count" id="recipeCount"></span>
+            </div>
+
+            <div class="grid" id="adminGrid">
+                <p class="loading">Loading recipes...</p>
+            </div>
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <h3>No recipes found</h3>
+                <p>Try a different search or category.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Sweet Crumbs Baking Blog. Happy Baking! 🍪</p>
+        </div>
+    </footer>
+
+    <script src="supabase.js"></script>
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+    <script>
+        let allRecipes = [];
+
+        function renderAdminCards(list) {
+            const grid = document.getElementById('adminGrid');
+            const empty = document.getElementById('emptyState');
+            document.getElementById('recipeCount').textContent = `${list.length} recipe${list.length === 1 ? '' : 's'}`;
+
+            if (!list.length) {
+                grid.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+            grid.style.display = '';
+            empty.style.display = 'none';
+            grid.innerHTML = list.map(recipe => `
+                <article class="recipe-card" data-category="${recipe.category}">
+                    <img src="${recipe.image}" alt="${recipe.title}" class="recipe-card-image" loading="lazy">
+                    <div class="recipe-card-content">
+                        <span class="recipe-card-category">${recipe.category}${recipe.visibility === 'private' ? ' · Private' : ''}</span>
+                        <h3 class="recipe-card-title">${recipe.title}</h3>
+                        <p class="recipe-card-description">${recipe.description}</p>
+                        <div class="recipe-card-meta">
+                            <span>⏱️ ${(recipe.prepTime || 0) + (recipe.cookTime || 0)} min</span>
+                            <span>👥 ${recipe.servings} servings</span>
+                            <span>📊 ${recipe.difficulty}</span>
+                        </div>
+                        <div class="my-recipe-actions">
+                            <a href="create-recipe.html?id=${encodeURIComponent(recipe.id)}" class="btn my-action-btn my-action-edit">Edit</a>
+                            <button class="btn my-action-btn my-action-delete" onclick="deleteRecipeFromAdmin('${recipe.id}')">Delete</button>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        async function deleteRecipeFromAdmin(id) {
+            if (!confirm('Delete this recipe? This cannot be undone.')) return;
+            try {
+                await deleteRecipe(id);
+                showToast('Recipe deleted');
+                allRecipes = allRecipes.filter(r => r.id !== id);
+                applyFilters();
+            } catch (err) {
+                console.error(err);
+                showToast('Could not delete recipe');
+            }
+        }
+
+        function applyFilters() {
+            const q = document.getElementById('searchInput').value.trim().toLowerCase();
+            const cat = document.getElementById('categoryFilter').value;
+            const filtered = allRecipes.filter(r => {
+                if (cat !== 'all' && r.category !== cat) return false;
+                if (!q) return true;
+                return (r.title || '').toLowerCase().includes(q)
+                    || (r.id || '').toLowerCase().includes(q);
+            });
+            renderAdminCards(filtered);
+        }
+
+        (async () => {
+            // Only admins can manage all recipes.
+            const admin = await isAdmin();
+            if (!admin) { window.location.href = 'index.html'; return; }
+
+            try {
+                allRecipes = await fetchRecipes();
+
+                // Populate category filter from the data
+                const cats = new Set(allRecipes.map(r => r.category).filter(Boolean));
+                const select = document.getElementById('categoryFilter');
+                [...cats].sort().forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.textContent = c;
+                    select.appendChild(opt);
+                });
+
+                document.getElementById('searchInput').addEventListener('input', applyFilters);
+                select.addEventListener('change', applyFilters);
+                applyFilters();
+            } catch (err) {
+                console.error(err);
+                document.getElementById('adminGrid').innerHTML = '<p class="loading">Failed to load recipes.</p>';
+            }
+        })();
+    </script>
+</body>
+</html>
